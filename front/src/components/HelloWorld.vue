@@ -22,7 +22,8 @@
   <el-input v-model="testB" placeholder="b" style="display:inline-table; width: 30%; float:left"></el-input>
   <el-button type="primary" @click="test(testA,testB)" style="float:left; margin: 2px;">test</el-button>
   <p>{{testout}}</p>
-  <el-button type="primary" @click="backtest" style="float:left; margin: 2px;">backtest</el-button>
+  <el-button @click="backtest(testA)" style="float:left; margin: 2px;">backtest</el-button>
+  <el-button @click="test2(testA, testB)" style="float:left; margin: 2px;">test2</el-button>
 
 </div>
 </template>
@@ -55,16 +56,31 @@ export default {
       })
     },
 
-    backtest: function() {
-      this.axios.get('http://127.0.0.1:8000/api/backtest')
+    backtest: function(a) {
+      this.axios.get('http://127.0.0.1:8000/api/backtest', {
+        params: {
+          a:a
+        }
+      })
       .then((response) => {
-        alert("done")
+        // alert("done")
         console.log(response)
       })
       .catch(function (error) {
         console.log(error)
       })
-    }
+    },
+
+    test2: function(a,b) {
+      this.axios.get('http://127.0.0.1:8000/api/test2')
+      .then((response) => {
+        alert("rnm")
+        console.log(response)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
 
 
   }

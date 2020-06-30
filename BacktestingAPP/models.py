@@ -1,12 +1,6 @@
 from django.db import models
 # Create your models here.
 
-class Book(models.Model):
-    book_name = models.CharField(max_length=64)
-    add_time = models.DateTimeField(auto_now_add=True)
-
-    def __unicode__(self):
-        return self.book_name
 
 # new stuff ,testMarket start=====
 
@@ -21,27 +15,19 @@ class Book(models.Model):
 class Hushen300Component(models.Model):
     index_code = models.TextField(blank=True, null=True)
     con_code = models.TextField(blank=True, null=True)
-    trade_date = models.TextField(blank=True, null=True)
+    trade_day = models.ForeignKey('TradeCalendar',on_delete=models.CASCADE)
     weight = models.FloatField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'Hushen300component'
 
 
 class LatestFactor(models.Model):
     ts_code = models.TextField(blank=True, null=True)
-    trade_date = models.TextField(blank=True, null=True)
+    trade_day = models.ForeignKey('TradeCalendar',on_delete=models.CASCADE)
     adj_factor = models.FloatField(blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'latest_factor'
 
-
-class Marketinfo(models.Model):
+class MarketInfo(models.Model):
     ts_code = models.CharField(max_length=64)
-    trade_date = models.DateField()
+    trade_day = models.ForeignKey('TradeCalendar',on_delete=models.CASCADE)
     open = models.FloatField(blank=True, null=True)
     high = models.FloatField(blank=True, null=True)
     low = models.FloatField(blank=True, null=True)
@@ -50,26 +36,16 @@ class Marketinfo(models.Model):
     pct_chg = models.FloatField(blank=True, null=True)
     adj_factor = models.FloatField(blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'marketinfo'
 
-
-class TradeCal(models.Model):
+class TradeCalendar(models.Model):
     exchange = models.CharField(max_length=64, blank=True, null=True)
     trade_date = models.DateField(blank=True, null=True)
     is_open = models.BooleanField(blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'trade_cal'
-
-
-# ====testMarket End, 20200start=====
 
 class BackwardMarket(models.Model):
     ts_code = models.TextField(blank=True, null=True)
-    trade_date = models.DateField(db_index=True)
+    trade_day = models.ForeignKey('TradeCalendar',on_delete=models.CASCADE)
     open = models.FloatField(blank=True, null=True)
     high = models.FloatField(blank=True, null=True)
     low = models.FloatField(blank=True, null=True)
@@ -80,19 +56,18 @@ class BackwardMarket(models.Model):
 
 class ForwardMarket(models.Model):
     ts_code = models.TextField(blank=True, null=True)
-    trade_date = models.DateField(db_index=True)
+    trade_day = models.ForeignKey('TradeCalendar',on_delete=models.CASCADE)
     open = models.FloatField(blank=True, null=True)
     high = models.FloatField(blank=True, null=True)
     low = models.FloatField(blank=True, null=True)
     close = models.FloatField(blank=True, null=True)
     vol = models.FloatField(blank=True, null=True)
     pct_chg = models.FloatField(blank=True, null=True)
-
 
 
 class Marketnow(models.Model):
     ts_code = models.TextField(blank=True, null=True)
-    trade_date = models.DateField(db_index=True)
+    trade_day = models.ForeignKey('TradeCalendar',on_delete=models.CASCADE)
     open = models.FloatField(blank=True, null=True)
     high = models.FloatField(blank=True, null=True)
     low = models.FloatField(blank=True, null=True)
@@ -101,10 +76,8 @@ class Marketnow(models.Model):
     pct_chg = models.FloatField(blank=True, null=True)
 
 
-class TradeCalendar(models.Model):
-    trade_date = models.DateField(db_index=True)
-
-# ==20200 end, atest start===
+# class TradeCalendar(models.Model):
+#     trade_date = models.DateField(db_index=True)
 
 
 class CurrentPosition(models.Model):
@@ -131,11 +104,11 @@ class HistPosition(models.Model):
 class OrderBook(models.Model):
     order_id = models.AutoField(primary_key=True)
     book = models.TextField()
-    trade_date = models.DateField()
+    trade_day = models.ForeignKey('TradeCalendar',on_delete=models.CASCADE)
     ts_code = models.TextField()
     order_type = models.TextField()
-    limit_price = models.FloatField(blank=True, null=True)  # This field type is a guess.
-    amount = models.FloatField(blank=True, null=True)  # This field type is a guess.
+    limit_price = models.FloatField(blank=True, null=True)
+    amount = models.FloatField(blank=True, null=True)
     amount_type = models.TextField()
     validity_term = models.IntegerField(blank=True, null=True)
     order_status = models.TextField()

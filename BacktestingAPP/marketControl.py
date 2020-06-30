@@ -1,43 +1,32 @@
-
+import numpy as np
 import pandas as pd
 import time
-import pandas as pd
-from datetime import datetime
-# import generalsupport as gs
-# import marketexpress
-# import brokerdatabase
-# import pickyinvestor
-# import monobroker
+import datetime
+import random
+
+from .models import *
+from django.db import connection
+from django_pandas.io import read_frame
+from django.db import transaction
 
 
 class VirtualMarket:
     def __init__(self):
         self.priceEngine = "backward"
-        self.start_date = "20190601"
-        self.end_date = "20200601"
-        self.cash = 100000
+        self.start_date = datetime.date(2019,6,1)
+        self.end_date = datetime.date(2020,6,1)
         self.stock_pool = None # 除非用户设定setStockPool, 否则默认本次不存在股票池, 是针对数据库中的所有股票.
-        self.strategy = ""
-
-        # 初始化:使用参数（前/后，起始，终止，策略，初始资金（可缺省），股票池（可缺省））。如果报错直接raise。否则：
-        # 初始化一个几个小数据表：
-        #     trade_calendar是大数据表当中在这个范围内的日期,
-        #     backward,forward
-        # ；
-        #
-        # 然后，初始化交易表(brokerdatabase)，其中涉及到初始资金；
-        #
-        # 把这次回测的所有交易日提取出来，准备开始回测；
-        #
-        # 回测：
+        self.strategy = Strategy()
+        self.strategy.setBook(10000)
+        self.broker = Broker()
+        # 初始化:使用参数（前/后，起始，终止，策略，初始资金（可缺省），股票池（可缺省））。如果报错直接raise
 
     def setRunningInterval(self, start_date, end_date):
         """
         设置交易的开始和结束日期,并从datamonger对象中获得对应的交易日历
         start_date, end_date: "yyyymmdd"
         """
-        self.start_date = addDashtoDate(start_date)
-        self.end_date = addDashtoDate(end_date)
+        pass
 
     def setStockPool(self, stock_pool = None):
         """
@@ -56,242 +45,372 @@ class VirtualMarket:
         else:
             print("只能设置前复权或者后复权!")
 
-    def setCash(self, cash):
-        self.cash = cash
-
     def setStrategy(self):
-        # self.strategy = pickyinvestor.PickyInvestor()
         pass
 
-    # def createMarketExpressDB(self, mother_db_name, marketexpress_db_name):
-    #     """
-    #     用来初始化本次需要的Market Express 数据库. 目的是加载
-    #     1. 和本次回测时间和股票池有关的市场数据/ 前复权 and 后复权
-    #     2. 复制相关的交易日历
-    #     3. 创建一个marketnow的临时数据表格
-    #     """
-    #     meconn, mec  = gs.connectDB(marketexpress_db_name)
-    #     # 根据stock_pool决定是否要对其进行filter
-    #     if self.stock_pool is None:
-    #         stock_pool_str = ""
-    #     else:
-    #         stock_pool_str = """AND ts_code IN ({0})""".format(gs.handleQueryStockList(self.stock_pool))
-    #
-    #     statement  = """
-    #     ATTACH DATABASE '{0}' AS source;
-    #
-    #     CREATE TABLE main.trade_cal AS
-    #     SELECT trade_date FROM source.trade_cal
-    #     WHERE trade_date >= DATE('{1}')
-    #     AND trade_date <= DATE('{2}')
-    #     AND exchange = 'SSE'
-    #     AND is_open = 1
-    #     ORDER BY trade_date;
-    #
-    #     CREATE TABLE main.backward_market AS
-    #         SELECT ts_code,
-    #     	trade_date,
-    #     	open * adj_factor / latest_factor AS open,
-    #     	high * adj_factor / latest_factor AS high,
-    #     	low * adj_factor / latest_factor AS low,
-    #     	close * adj_factor / latest_factor AS close,
-    #     	vol,
-    #     	pct_chg
-    #         FROM (
-    #         	SELECT a.ts_code,
-    #         		a.trade_date,
-    #         		a.open,
-    #         		a.high,
-    #         		a.low,
-    #         		a.close,
-    #         		a.vol,
-    #         		a.pct_chg,
-    #         		a.adj_factor,
-    #         		b.adj_factor AS latest_factor
-    #         	FROM source.marketinfo a
-    #         	LEFT JOIN source.latest_factor b ON a.ts_code = b.ts_code
-    #         	)
-    #         WHERE trade_date >= DATE('{1}')
-    #         AND trade_date <= DATE('{2}')
-    #         {3};
-    #
-    #     CREATE INDEX idx_backward_trade_date
-    #         ON backward_market(trade_date);
-    #
-    #     CREATE TABLE main.forward_market AS
-    #         SELECT ts_code,
-    #     	trade_date,
-    #     	open * adj_factor AS open,
-    #     	high * adj_factor AS high,
-    #     	low * adj_factor AS low,
-    #     	close * adj_factor AS close,
-    #     	vol,
-    #     	pct_chg
-    #         FROM source.marketinfo
-    #         WHERE trade_date >= DATE('{1}')
-    #         AND trade_date <= DATE('{2}')
-    #         {3};
-    #
-    #      CREATE INDEX idx_forward_trade_date
-    #         ON backward_market(trade_date);
-    #
-    #     DETACH source;
-    #     """.format(
-    #     mother_db_name,
-    #     self.start_date,
-    #     self.end_date,
-    #     stock_pool_str)
-    #     # 提交该statement, 然后关闭连接
-    #     mec.executescript(statement)
-    #     meconn.close()
-    #     print(statement)
-    #
-    # def setMarketExpressDB(self, marketexpress_db_name):
-    #     """
-    #     当已经存在了MarketExpress数据库时, 直接连接, 跳过新建的步骤.
-    #
-    #     Parameters
-    #     ----------
-    #     marketexpress_db_name : String
-    #         DESCRIPTION.
-    #
-    #     Returns
-    #     -------
-    #     None.
-    #
-    #     """
-    #     self.marketdb = marketexpress.MarketExpress(marketexpress_db_name)
-    #
-    # def setBrokerDB(self, brokerdatabase_name):
-    #     """
-    #     初始化一个Brokerdatabase实例. 对每次回测而言会新建一个数据库记录本次的交易详情.
-    #
-    #     Returns
-    #     -------
-    #     None.
-    #
-    #     """
-    #     self.brokerdb = brokerdatabase.Brokerdatabase()
-    #     self.brokerdb.createBrokerDatabase(brokerdatabase_name)
-    #     # 新建该数据库之后, 插入hist_position表格
-    #     self.brokerdb.createHistPositionTable()
-    #     # 插入current_position表格
-    #     self.brokerdb.createCurrentPositionTable()
-    #     # 插入order_book表格
-    #     self.brokerdb.createOrderBookTable()
-    #
-    # def setTradingBookInfo(self):
-    #     """
-    #     Call Strategy中的用户信息函数, 将结果传递给monobroker对象的addInvestorBooks方法. 随后该信息会通过broker加入到brokerdatabase的current_position表格里作为初始资金.
-    #
-    #     Returns
-    #     -------
-    #     None.
-    #
-    #     """
-    #     # 从strategy获取本次的trading book信息.
-    #     book_dict = self.strategy.myTradingBooks()
-    #     # 将参数传递给broker对象.
-    #     self.broker.addInvestorBooks(book_dict)
-    #
-    # def setTradingCalendar(self):
-    #     """
-    #     在用户已经set开始和结束日期之后, 而且已经连接了这次回测使用的MarketExpress数据库后, 提取出全部的trade_date为一个List, 作为本次回测的Calender. 并且初始化current_date
-    #
-    #     Returns
-    #     -------
-    #     None.
-    #
-    #     """
-    #     self.trade_cal = self.marketdb.getTradingCalendar(self.start_date, self.end_date)
-    #
-    #     self.current_date = self.start_date
-    #
-    # def refreshMarketNow(self):
-    #     """
-    #     进入新的一天时, 命令MarketExpress数据库更新今天的MarketNow数据表.
-    #     """
-    #     self.marketdb.updateMarketNow(self.current_date, self.priceEngine)
-    #
-    # def setTradingStrategy(self, strategy_instance):
-    #     self.strategy = strategy_instance
-    #
-    # def execute(self):
-    #
-    #     backtest_start = time.time()
-    #     # -- 开始回测前
-    #     self.setTradingCalendar()
-    #     self.broker = monobroker.MonoBroker()
-    #     self.broker.setBrokerDatabase(self.brokerdb)
-    #     self.broker.setMarketDatabase(self.marketdb)
-    #     self.strategy.setBrokerDatabase(self.brokerdb)
-    #     self.strategy.setMarketDatabase(self.marketdb)
-    #
-    #     # 初始化账户信息
-    #     self.setTradingBookInfo()
-    #
-    #     # -- 回测开始
-    #     for tradingdate in self.trade_cal:
-    #         loop_start = time.time()
-    #         # 更新日期
-    #         self.current_date = tradingdate
-    #         # 更新今天的marketnow数据表
-    #         self.refreshMarketNow()
-    #         # 传递参数给brokerdatabase和investor
-    #         self.brokerdb.setCurrentDate(tradingdate)
-    #         self.strategy.setCurrentDate(tradingdate)
-    #
-    #
-    #         lasting = time.time() - loop_start
-    #         print( self.current_date ,"开盘前耗时" + str(lasting))
-    #         loop_start = time.time()
-    #
-    #         # 响应开盘
-    #         self.broker.brokerResponseMarketOpen()
-    #         self.strategy.myTradingOpen()
-    #
-    #         lasting = time.time() - loop_start
-    #         print( "开盘耗时" + str(lasting))
-    #         loop_start = time.time()
-    #
-    #
-    #         # 响应盘中
-    #         self.broker.brokerResponseMarketMiddle()
-    #         self.strategy.myTradingIntra()
-    #         # 响应盘后
-    #         self.broker.brokerVectorResponseMarketClose()
-    #         # self.broker.brokerResponseMarketClose()
-    #         self.strategy.myTradingClose()
-    #
-    #
-    #         lasting = time.time() - loop_start
-    #         print( "收盘耗时" + str(lasting))
-    #         loop_start = time.time()
-    #
-    #
-    #         # 最后broker盘整
-    #         self.broker.brokerFinishingToday()
-    #
-    #         lasting = time.time() - loop_start
-    #         print( "盘整耗时" + str(lasting))
-    #         loop_start = time.time()
-    #
-    #     # -- 回测结束
-    #     # 关闭数据库的连接
-    #     self.brokerdb.close()
-    #     self.marketdb.close()
-    #
-    #     backtest_end = time.time()
-    #     self.testoutput = backtest_end - backtest_start
-    #     print("整个回测用时", self.testoutput)
-    #
+    def updateMarketNow(self,TradeDay):
+        """
+        给定一个日期, MarketNow数据表刷新为当天的数据. 采用how的方式.
+        how可以选择forward 或者 backward.
+        """
+        Marketnow.objects.all().delete()
+        if self.priceEngine == "backward":
+            qs = BackwardMarket.objects.filter(trade_day=TradeDay.id)
+        if self.priceEngine == "forward":
+            qs = BackwardMarket.objects.filter(trade_day=TradeDay.id)
+        Marketnow.objects.bulk_create(qs)
+
+    def initializeBacktesting(self):
+        OrderBook.objects.all().delete()
+        HistPosition.objects.all().delete()
+        CurrentPosition.objects.all().delete()
+
+        bookList = []
+        for accName in self.strategy.book:
+            bookList.append(CurrentPosition(
+            book = accName,
+            ts_code = "cash",
+            position = self.strategy.book[accName]
+            ))
+        CurrentPosition.objects.bulk_create(bookList)
+
+    def execute(self):
+        backtest_start = time.time()
+        self.initializeBacktesting()
+
+        for TradeDay in self.calandar:
+
+            self.updateMarketNow(TradeDay)
+            self.strategy.setCurrentDate(TradeDay)
+            self.broker.setCurrentDate(TradeDay)
+
+            self.broker.brokerResponseMarketOpen()
+            orders = self.strategy.executeTradeOpen()
+            OrderBook.objects.bulk_create(orders)
+
+            self.broker.brokerResponseMarketMiddle()
+            orders = self.strategy.executeTradeIntra()
+            OrderBook.objects.bulk_create(orders)
+
+            self.broker.brokerResponseMarketClose()
+            orders = self.strategy.executeTradeClose()
+            OrderBook.objects.bulk_create(orders)
+
+            # 最后broker盘整
+            # self.broker.brokerFinishingToday()
+        # -- 回测结束
+        backtest_end = time.time()
+        return backtest_end - backtest_start
 
 
 
+class Strategy:
+    # private
+    def __init__(self):
+        pass
 
-# import sqlite3
-# import tushare as ts
+    def setCurrentDate(self,Day):
+        self.currentDay = Day
 
+    def setBook(self,cash):
+        self.book = {"a": 200000, "b": 100000}
+
+    # public interface
+    def getCurrentDate(self):
+        return self.currentDay.trade_date
+
+    def getMarketInfo(self):
+        pass
+
+    def getPosition(self):
+        pass
+
+    def makeMarketOrderByValue(self,book,ticker,amount):
+        self.orders.append(OrderBook(
+            book = book,
+            ts_code = ticker,
+            order_type = "market",
+            amount = amount,
+            amount_type = "value",
+            order_status = "pending",
+            trade_day_id = self.currentDay.id
+        ))
+
+    def makeMarketOrderByShares(self,book,ticker,amount):
+        self.orders.append(OrderBook(
+            book = book,
+            ts_code = ticker,
+            order_type = "market",
+            amount = amount,
+            amount_type = "shares",
+            order_status = "pending",
+            trade_day_id = self.currentDay.id
+        ))
+
+    def makeLimitOrderByValue(self,book,ticker,amount,price,validity_term):
+        self.orders.append(OrderBook(
+            book = book,
+            ts_code = ticker,
+            order_type = "limit",
+            limit_price = price,
+            amount = amount,
+            amount_type = "value",
+            validity_term = validity_term,
+            order_status = "pending",
+            trade_day_id = self.currentDay.id
+        ))
+
+    def makeLimitOrderByShares(self,book,ticker,amount,price,validity_term):
+        self.orders.append(OrderBook(
+            book = book,
+            ts_code = ticker,
+            order_type = "limit",
+            limit_price = price,
+            amount = amount,
+            amount_type = "shares",
+            validity_term = validity_term,
+            order_status = "pending",
+            trade_day_id = self.currentDay.id
+        ))
+
+    # public useredit
+    def executeTradeOpen(self):
+        self.orders = []
+        self.makeMarketOrderByShares("a","000830.SZ",(random.random()-0.5)*100)
+        return self.orders
+
+    def executeTradeIntra(self):
+        pass
+
+    def executeTradeClose(self):
+        pass
+
+class Broker:
+    def __init__(self):
+        pass
+
+    def setCurrentDate(self,Day):
+        self.currentDay = Day
+
+    def getCurrentDate(self):
+        return self.currentDay.trade_date
+
+    def readMarketPendingOrder(self):
+        qs = OrderBook.objects.filter(
+        order_status = "pending",
+        order_type = "market"
+        )
+        qs_dataframe = read_frame(qs=qs,index_col='order_id')
+        return qs_dataframe
+
+    def readLimitPendingOrder(self):
+        qs = OrderBook.objects.filter(
+        order_status = "pending",
+        order_type = "limit"
+        )
+        qs_dataframe = read_frame(qs=qs, index_col='order_id')
+        return qs_dataframe
+
+    def readCurrentPosition(self):
+        qs = CurrentPosition.objects.all()
+        return read_frame(qs)
+
+    def getMarketNow(self, ticker_list):
+        qs = Marketnow.objects.filter(ts_code__in=ticker_list)
+        return read_frame(qs)
+
+    def vectorizedHandleMarketOrder(self, userPosition, daily_price, order_book):
+        """
+        向量化的处理市价单.
+        userPosition 没有设置index的原生数据表.
+        daily_price 只包含ts_code 和 price两列
+        order_book 原生的pending_orders Market
+
+        """
+        userPosition.set_index(['book','ts_code'], inplace = True)
+        # 先合并价格和order_book
+        order_book = pd.merge(order_book, daily_price, how = 'left', on = 'ts_code')
+
+        # 计算order_shares, 把value下单的部分转化为股票数的担子
+        order_book['amount'] = np.where(order_book['amount_type'] == 'value', np.floor_divide(order_book['amount'], order_book['price']), order_book['amount'])
+
+        # 计算order_amount
+        order_amount = (order_book['amount_type'].values == 'shares') * 1 * order_book['amount'].values * order_book['price'].values
+
+        # 计算衍生出来的税费
+        broker_fee = np.maximum(np.abs(order_amount) * 0.00012, np.full_like(order_amount , 5))
+        broker_tax = np.abs(np.minimum(order_amount * 0.001, np.full_like(order_amount, 0)))
+        total_transaction_cost = broker_fee + broker_tax
+
+        # 计算总的payoff
+        order_cost = order_amount + total_transaction_cost
+
+        # 按照账户名称和order_cost排序
+        order_book['order_cost'] = order_cost
+        order_book = order_book.sort_values(by = ['book', 'order_cost'])
+
+        # 创建总的更新序列
+        updated_order_status = np.array([])
+
+        for each_book in np.unique(order_book['book'].values):
+            # 获取这个账户的order_book
+            this_book_order_book = order_book[order_book['book'] == each_book]
+            # 如果这个账户没有订单, 那么直接处理下一个账户.
+            if this_book_order_book.empty:
+                continue
+            # 首先找到账户剩余的现金
+            cash_available = userPosition.loc[(each_book, 'cash'), 'position']
+            # 和该账户相关的order的累计执行成本
+            order_cost_cumsum = np.cumsum(this_book_order_book['order_cost'].values)
+            # 假定用当前的现金按顺序累计执行, 会剩余多少钱?
+            assume_order_complete = cash_available - order_cost_cumsum
+            # 更新订单状态, 大于等于0的可以被成功执行, 否则会失败
+            order_status_this_book = np.full(assume_order_complete.shape, 'pending')
+            # 把没有今天价格的订单设置为-1
+            assume_order_complete[np.isnan(assume_order_complete)] = -1
+            order_status_this_book = np.where(assume_order_complete >= 0, 'Success', 'Not Enough Cash')
+            # 对-1的值, 证明没有价格, 返回其他信息(这里是一个妥协)
+            order_status_this_book[assume_order_complete == -1] = "No Price Available"
+            # 计算剩余的现金
+            # 再剩余的累加中, 寻找大于0的最小值. 也就是剩余的现金.
+            cash_after = np.min(assume_order_complete[assume_order_complete >= 0])
+            updated_order_status = np.append(updated_order_status, order_status_this_book)
+            # 更新现金
+            userPosition.loc[(each_book, 'cash'), 'position'] = cash_after
+
+        # 把更新的订单状态赋值给order_book
+        order_book['order_status'] = updated_order_status
+        # 从而可以传出更新order_status的List of tuple
+        order_status_tobereturned = order_book[['order_status', 'order_id']].to_records(index = False).tolist()
+
+        # 下面就是更复杂的更新仓位啦!
+        # 用集合操作把没有建仓的账户股票组合找出来, 然后将表格append上去.
+        order_book_index_set = set(order_book[order_book['order_status'] == 'Success'][['book', 'ts_code']].to_records(index = False).tolist())
+        position_index_set = set(userPosition.index.tolist())
+
+        whatsnewposition = order_book_index_set.difference(position_index_set)
+
+        # 如果这个集合不是空的, 说明userPosition需要加入新的行.
+        if bool(whatsnewposition):
+            index = pd.MultiIndex.from_tuples(list(whatsnewposition))
+            append_df = pd.DataFrame(0, index, columns = userPosition.columns)
+            userPosition = userPosition.append(append_df)
+
+        # 合并userPosition和order_book.
+        # 从orderbook中筛选出有用的信息, 已经成功的交易单
+        temp_order_book = order_book[order_book['order_status'] == 'Success'][['book', 'ts_code', 'amount', 'order_cost']]
+        # 保证同一个book和同一个ts_code只有一个记录.
+        temp_order_book.groupby(['book','ts_code']).sum()
+        # 合并仓位表格和order_book
+        calculation_df = pd.merge(userPosition, temp_order_book, how = 'left', on = ['book', 'ts_code']).fillna(0)
+        userPosition = userPosition.fillna(0)
+
+        position_after_trade = userPosition['position'].values + calculation_df['amount'].values
+
+        userPosition['wavg_cost'] = np.where(position_after_trade == 0 , 0, (userPosition['wavg_cost'].values * userPosition['position'].values + calculation_df['order_cost'].values) / position_after_trade)
+
+        userPosition['position'] = userPosition['position'].values + calculation_df['amount'].values
+
+        return order_status_tobereturned, userPosition
+
+    def updateOrderStatus(self,statements):
+        with transaction.atomic():
+            for statement in statements:
+                changedOrder = OrderBook.objects.get(order_id=statement[1])
+                changedOrder.order_status = statement[0]
+                changedOrder.save()
+
+    def updateCurrentPosition(self,userPosition):
+        """# WARNING: hardcode"""
+        userPosition.to_sql(
+        "BacktestingAPP_currentposition",
+        connection,
+        if_exists = 'replace',
+        index = true)
+
+    def brokerResponseMarketOpen(self):
+        """
+        处理每天的开盘阶段.
+        """
+        # 获取三大表格, 当前持仓, 今日市场和pendingMarketOrder
+        # pendingMarketOrder = self.readMarketPendingOrder()
+        # 如果pendingMarketOrder没有任何交易的话..直接退出函数
+        # if pendingMarketOrder.empty:
+        #     return None
+        # userPosition = self.readCurrentPosition()
+        # # 获取可能要使用的股票池
+        # stock_pool_list = pendingMarketOrder['ts_code'].unique().tolist()
+        # stock_pool_price = self.getMarketNow(stock_pool_list)
+        # stock_pool_price.rename(columns={'open' : 'price'}, inplace = True)
+        #
+        # update_order_status_list, userPosition = self.vectorizedHandleMarketOrder(userPosition, stock_pool_price, pendingMarketOrder)
+        #
+        # "这底下两个要改，但是上头是对的"
+
+        # 更新order status
+        # self.updateOrderStatus(update_order_status_list)
+        # 更新当前的仓位
+        # self.updateCurrentPosition(userPosition)
+        pass
+
+    def brokerResponseMarketMiddle(self):
+        pass
+
+    def brokerResponseMarketClose(self):
+        pass
+
+
+def initializeContainer(request, market):
+    BackwardMarket.objects.all().delete()
+    ForwardMarket.objects.all().delete()
+
+    validDates = TradeCalendar.objects.filter(
+        trade_date__range=(market.start_date,market.end_date),
+        exchange = "SSE",
+        is_open = 1
+    ).order_by("trade_date")
+    market.calandar = validDates
+
+    startDateID = validDates[0].id
+    endDateID = validDates[len(validDates)-1].id
+
+    with connection.cursor() as cursor:
+        statement = """
+        INSERT INTO main.BacktestingAPP_backwardmarket
+        (ts_code,open,close,high,low,vol,pct_chg,trade_day_id)
+        SELECT
+        a.ts_code,
+        a.open * a.adj_factor / b.adj_factor,
+        a.close * a.adj_factor / b.adj_factor,
+        a.high * a.adj_factor / b.adj_factor,
+        a.low * a.adj_factor / b.adj_factor,
+        a.vol,
+        a.pct_chg,
+        a.trade_day_id
+        FROM main.BacktestingAPP_marketinfo a
+        LEFT JOIN main.BacktestingAPP_latestfactor b
+        ON a.ts_code = b.ts_code
+        WHERE
+        a.trade_day_id >= %s AND a.trade_day_id <= %s;"""
+        cursor.execute(statement, [startDateID, endDateID])
+
+        statement = """
+        INSERT INTO main.BacktestingAPP_forwardmarket
+        (ts_code,open,close,high,low,vol,pct_chg,trade_day_id)
+        SELECT
+        ts_code,
+        open * adj_factor,
+        close * adj_factor,
+        high * adj_factor,
+        low * adj_factor,
+        vol,
+        pct_chg,
+        trade_day_id
+        FROM main.BacktestingAPP_marketinfo
+        WHERE
+        trade_day_id >= %s AND trade_day_id <= %s;
+        """
+        cursor.execute(statement, [startDateID, endDateID])
 
 # def execmtSQL(sentence, conn, cursor):
 #     cursor.execute(sentence)
@@ -385,12 +504,12 @@ class VirtualMarket:
 #
 # def compareDf(df1, df2):
 #     pd.concat([df1, df2]).drop_duplicates(keep = False)
-
-def addDashtoDate(date_string):
-    date_object = datetime.strptime(date_string, "%Y%m%d")
-    new_date_string = datetime.strftime(date_object, "%Y-%m-%d")
-    return new_date_string
-
+#
+# def addDashtoDate(date_string):
+#     date_object = datetime.strptime(date_string, "%Y%m%d")
+#     new_date_string = datetime.strftime(date_object, "%Y-%m-%d")
+#     return new_date_string
+#
 # def removeDashFromDate(date_string):
 #     date_object = datetime.strptime(date_string, "%Y-%m-%d")
 #     new_date_string = datetime.strftime(date_object, "%Y%m%d")
@@ -410,13 +529,13 @@ def addDashtoDate(date_string):
 #     return df['trade_date']
 #
 # def addCommaQuoteToList(sample_list):
-    result = ""
-    if len(sample_list) > 1:
-        separator = "','"
-        result = "'" + separator.join(sample_list) + "'"
-    if len(sample_list) == 1:
-        result = "'" + str(sample_list[0]) + "'"
-    return result
+#     result = ""
+#     if len(sample_list) > 1:
+#         separator = "','"
+#         result = "'" + separator.join(sample_list) + "'"
+#     if len(sample_list) == 1:
+#         result = "'" + str(sample_list[0]) + "'"
+#     return result
 
 def handleStockPoolType(stock_pool):
     """

@@ -14,13 +14,13 @@ import numpy as np
 class MonoBroker:
     def __init__(self):
         pass
-    
+
     def setBrokerDatabase(self, db_instance):
         self.brokerdb = db_instance
-    
+
     def setMarketDatabase(self, db_instance):
         self.marketdb = db_instance
-        
+
     def handleSingleMarketOrder(self, book, ts_code, amount, amount_type, df_stock_price, df_user_position, marketPhase):
         """
         执行某一个Market Order.
@@ -49,12 +49,12 @@ class MonoBroker:
             处理后的用户持仓数据表.
 
         """
-        
+
         try:
             stock_price = df_stock_price.loc[ts_code, marketPhase]
         except KeyError:
             return "No Price Available", df_user_position
-        
+
         # 判断当前交易需要的费用, 暂时假定没有滑点
         if amount_type == "shares":
             deal_shares = amount
@@ -93,9 +93,9 @@ class MonoBroker:
             return "Success", df_user_position
         # 如果没成交
         else:
-            # 修改order status 
+            # 修改order status
             return "Not Enough Cash", df_user_position
-        
+
     def brokerResponseMarketOpen(self):
         """
         处理每天的开盘阶段.
@@ -129,13 +129,13 @@ class MonoBroker:
         self.brokerdb.updateOrderStatus(update_order_status_list)
         # 更新当前的仓位
         self.brokerdb.updateCurrentPosition(userPosition)
-            
+
     def brokerResponseMarketMiddle(self):
         """
         处理市场的盘中阶段.
         """
         pass
-    
+
     def brokerResponseMarketClose(self):
         """
         处理每天的开盘阶段.
@@ -169,7 +169,7 @@ class MonoBroker:
         self.brokerdb.updateOrderStatus(update_order_status_list)
         # 更新当前的仓位
         self.brokerdb.updateCurrentPosition(userPosition)
-        
+
     def brokerFinishingToday(self):
         # 获取current position
         userPosition = self.brokerdb.readCurrentPosition()
@@ -179,7 +179,7 @@ class MonoBroker:
         stock_pool_list.remove('cash')
         # 调用今日价格数据
         # 如果list 为空: 我们只需要一个cash.
-        
+
         if len(stock_pool_list) == 0:
             stock_pool_price = pd.DataFrame([['cash', 1]], columns = ['ts_code', 'close'])
         # 否则, 获取股价数据, 并且把cashappend上去.
@@ -192,12 +192,12 @@ class MonoBroker:
         userPosition['value'] = calculation_df['position'] * calculation_df['close']
         userPosition['return'] = userPosition['value'] - userPosition['position'] * userPosition['wavg_cost']
         userPosition['pct_return'] = (userPosition['return'] / userPosition['position'] / userPosition['wavg_cost']) * 100
-        
+
         # 计算结束后, 将这个表格返回给数据库
         self.brokerdb.updateCurrentPosition(userPosition, False)
         # 并将这个表格append回历史持仓数据库
         self.brokerdb.updateHistPosition(userPosition)
-        
+
     def brokerVectorResponseMarketClose(self):
         # 获取三大表格, 当前持仓, 今日市场和pendingMarketOrder
         pendingMarketOrder = self.brokerdb.readMarketPendingOrder()
@@ -209,16 +209,16 @@ class MonoBroker:
         stock_pool_list = pendingMarketOrder['ts_code'].unique().tolist()
         stock_pool_price = self.marketdb.getMarketNow(['ts_code','close'], {'ts_code' : stock_pool_list})
         stock_pool_price.rename(columns={'close' : 'price'}, inplace = True)
-        
+
         update_order_status_list, userPosition = self.vectorizedHandleMarketOrder(userPosition, stock_pool_price, pendingMarketOrder)
-        
+
         # 更新order status
         self.brokerdb.updateOrderStatus(update_order_status_list)
         # 更新当前的仓位
         self.brokerdb.updateCurrentPosition(userPosition)
         
-        
-        
+
+
     def vectorizedHandleMarketOrder(self, userPosition, daily_price, order_book):
         """
         向量化的处理市价单.
@@ -230,28 +230,28 @@ class MonoBroker:
         userPosition.set_index(['book','ts_code'], inplace = True)
         # 先合并价格和order_book
         order_book = pd.merge(order_book, daily_price, how = 'left', on = 'ts_code')
-        
+
         # 计算order_shares, 把value下单的部分转化为股票数的担子
         order_book['amount'] = np.where(order_book['amount_type'] == 'value', np.floor_divide(order_book['amount'], order_book['price']), order_book['amount'])
-        
+
         # 计算order_amount
         order_amount = (order_book['amount_type'].values == 'shares') * 1 * order_book['amount'].values * order_book['price'].values
-        
+
         # 计算衍生出来的税费
         broker_fee = np.maximum(np.abs(order_amount) * 0.00012, np.full_like(order_amount , 5))
         broker_tax = np.abs(np.minimum(order_amount * 0.001, np.full_like(order_amount, 0)))
         total_transaction_cost = broker_fee + broker_tax
-        
+
         # 计算总的payoff
         order_cost = order_amount + total_transaction_cost
-        
+
         # 按照账户名称和order_cost排序
         order_book['order_cost'] = order_cost
         order_book = order_book.sort_values(by = ['book', 'order_cost'])
-        
+
         # 创建总的更新序列
         updated_order_status = np.array([])
-        
+
         for each_book in np.unique(order_book['book'].values):
             # 获取这个账户的order_book
             this_book_order_book = order_book[order_book['book'] == each_book]
@@ -277,25 +277,25 @@ class MonoBroker:
             updated_order_status = np.append(updated_order_status, order_status_this_book)
             # 更新现金
             userPosition.loc[(each_book, 'cash'), 'position'] = cash_after
-        
+
         # 把更新的订单状态赋值给order_book
         order_book['order_status'] = updated_order_status
         # 从而可以传出更新order_status的List of tuple
         order_status_tobereturned = order_book[['order_status', 'order_id']].to_records(index = False).tolist()
-        
+
         # 下面就是更复杂的更新仓位啦!
         # 用集合操作把没有建仓的账户股票组合找出来, 然后将表格append上去.
         order_book_index_set = set(order_book[order_book['order_status'] == 'Success'][['book', 'ts_code']].to_records(index = False).tolist())
         position_index_set = set(userPosition.index.tolist())
-        
+
         whatsnewposition = order_book_index_set.difference(position_index_set)
-        
+
         # 如果这个集合不是空的, 说明userPosition需要加入新的行.
         if bool(whatsnewposition):
             index = pd.MultiIndex.from_tuples(list(whatsnewposition))
             append_df = pd.DataFrame(0, index, columns = userPosition.columns)
             userPosition = userPosition.append(append_df)
-        
+
         # 合并userPosition和order_book.
         # 从orderbook中筛选出有用的信息, 已经成功的交易单
         temp_order_book = order_book[order_book['order_status'] == 'Success'][['book', 'ts_code', 'amount', 'order_cost']]
@@ -304,15 +304,15 @@ class MonoBroker:
         # 合并仓位表格和order_book
         calculation_df = pd.merge(userPosition, temp_order_book, how = 'left', on = ['book', 'ts_code']).fillna(0)
         userPosition = userPosition.fillna(0)
-        
+
         position_after_trade = userPosition['position'].values + calculation_df['amount'].values
-        
+
         userPosition['wavg_cost'] = np.where(position_after_trade == 0 , 0, (userPosition['wavg_cost'].values * userPosition['position'].values + calculation_df['order_cost'].values) / position_after_trade)
-        
+
         userPosition['position'] = userPosition['position'].values + calculation_df['amount'].values
-        
+
         return order_status_tobereturned, userPosition
-        
+
     def addInvestorBooks(self, book_dic):
         """
         传入的类型是dictionary, 类似以下结构.
