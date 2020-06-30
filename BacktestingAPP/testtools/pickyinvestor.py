@@ -42,6 +42,7 @@ class PickyInvestor():
         return trading_book_info
         
     def myTradingOpen(self):
+        
         start = time.time()
         # myRandomSet = ['000830.SZ' , '603288.SH', '601166.SH']
         # if datetime.strptime(self.currentDate, "%Y-%m-%d").weekday() == 0:

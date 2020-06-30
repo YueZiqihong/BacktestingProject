@@ -13,7 +13,7 @@ from django.db import transaction
 class VirtualMarket:
     def __init__(self):
         self.priceEngine = "backward"
-        self.start_date = datetime.date(2019,6,1)
+        self.start_date = datetime.date(2019,6,5)
         self.end_date = datetime.date(2020,6,1)
         self.stock_pool = None # 除非用户设定setStockPool, 否则默认本次不存在股票池, 是针对数据库中的所有股票.
         self.strategy = Strategy()
@@ -79,7 +79,7 @@ class VirtualMarket:
         self.initializeBacktesting()
 
         for TradeDay in self.calandar:
-
+            pass
             self.updateMarketNow(TradeDay)
             self.strategy.setCurrentDate(TradeDay)
             self.broker.setCurrentDate(TradeDay)

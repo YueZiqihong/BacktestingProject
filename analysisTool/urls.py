@@ -1,4 +1,4 @@
-"""BacktestingProject URL Configuration
+"""vegetableTest URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.0/topics/http/urls/
@@ -13,23 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-# from django.contrib import admin
-# from django.urls import path
-#
-# urlpatterns = [
-#     path('admin/', admin.site.urls),
-# ]
-#
 
 from django.conf.urls import url, include
-from django.contrib import admin
-from django.views.generic import TemplateView
-import BacktestingAPP.urls
-import analysisTool.urls
+from analysisTool import views
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^api/', include(BacktestingAPP.urls)),
-    url(r'^analysisTool/', include(analysisTool.urls)),
-    url(r'^$', TemplateView.as_view(template_name="index.html")),
+url(r'gettime$', views.getPortfolioData, ),
+# url(r'show_books$', views.show_books, ),
+# url(r'test$', views.test, ),
+# url(r'test2$', views.test2, ),
 ]

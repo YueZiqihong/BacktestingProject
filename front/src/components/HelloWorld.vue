@@ -25,6 +25,8 @@
   <el-button @click="backtest(testA)" style="float:left; margin: 2px;">backtest</el-button>
   <el-button @click="test2(testA, testB)" style="float:left; margin: 2px;">test2</el-button>
 
+  <el-button type="primary" @click="gettime(testA,testB)" style="float:left; margin: 2px;">timetest</el-button>
+
 </div>
 </template>
 
@@ -82,6 +84,22 @@ export default {
       })
     },
 
+    gettime: function(a,b) {
+      this.axios.get('http://127.0.0.1:8000/analysisTool/gettime', {
+        params: {
+          startDate: a,
+          endDate: b,
+          book: "ying"
+        }
+      })
+      .then((response) => {
+        alert("ying")
+        console.log(response)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+    },
 
   }
 }
