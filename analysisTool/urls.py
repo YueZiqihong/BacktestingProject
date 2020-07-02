@@ -18,8 +18,7 @@ from django.conf.urls import url, include
 from analysisTool import views
 
 urlpatterns = [
-url(r'gettime$', views.getPortfolioData, ),
-# url(r'show_books$', views.show_books, ),
-# url(r'test$', views.test, ),
-# url(r'test2$', views.test2, ),
+url(r'getPortfolio$', views.getPortfolioData, ),
+url(r'getMarket$', views.getMarketData, ),
+url(r'getTransaction$', views.getTransactionData, ),
 ]

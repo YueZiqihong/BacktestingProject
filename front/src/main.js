@@ -7,11 +7,16 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import App from './App'
 import router from './router'
+import qs from 'qs'
 
+
+Vue.prototype.$qs = qs;
 Vue.config.productionTip = false
 
-Vue.use(ElementUI)
+Vue.use(ElementUI);
 Vue.use(VueAxios,axios);
+Vue.use(qs);
+
 
 /* eslint-disable no-new */
 new Vue({
