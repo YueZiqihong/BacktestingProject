@@ -43,9 +43,10 @@ def getPortfolioData(request):
             trade_day_id__trade_date__range=(startDate,endDate),
             book = book
             )
-            .values("trade_day_id__trade_date")
+            .annotate(Date=F("trade_day_id__trade_date"))
+            .values("Date")
             .order_by("trade_day_id")
-            .annotate(total_value=Sum("value")))
+            .annotate(Value=Sum("value")))
             data[book] = json.dumps(list(positions), cls=DateEncoder)
         response["performance"] = data
         # 这种写法返回的数据在前端会被字符串括起来，需要eval
@@ -69,7 +70,11 @@ def getMarketData(request):
         trade_day_id__trade_date__range=(startDate,endDate),
         ts_code = ticker,
         )
-        .values("trade_day_id__trade_date","open","close","high","low","vol","pct_chg")
+        .annotate(
+        Date = F("trade_day_id__trade_date"),
+        Volume = F("vol"),
+        )
+        .values("Date","open","close","high","low","Volume")
         .order_by("trade_day_id"))
 
         response['marketData'] = json.dumps(list(marketData), cls=DateEncoder)

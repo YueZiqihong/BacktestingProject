@@ -28,13 +28,17 @@
   <br><br>
   <el-button type="primary" @click="getMarket(testA,testB)" style="float:left; margin: 2px;">Market</el-button>
   <el-button type="primary" @click="getTransaction(testA,testB)" style="float:left; margin: 2px;">Transaction</el-button>
-  <br>
-  <el-button type="primary" @click="drawLine" style="float:left; margin: 2px;">chart</el-button>
+  <br><br><br>
+
   <div id="testChart1" style="width: 600px;height:400px;"></div>
   <br><br><br>
   <div id="testChart2" style="width: 600px;height:400px;"></div>
   <br><br><br>
   <div id="testChart3" style="width: 600px;height:400px;"></div>
+  <br><br><br>
+  <div id="testChart4" style="width: 600px;height:400px;"></div>
+  <br><br><br>
+  <div id="testChart5" style="width: 600px;height:400px;"></div>
 
 </div>
 
@@ -95,7 +99,7 @@ export default {
       .then((response) => {
         alert("ying")
         // console.log(response["data"]["performance"]["yz"])
-        this.drawLine(response["data"]["performance"]["yz"],"testChart1")
+        this.drawPortfolio(response["data"]["performance"]["yz"],"testChart1")
         console.log(response)
       })
       .catch(function (error) {
@@ -106,14 +110,15 @@ export default {
     getMarket: function(a,b) {
       this.axios.get('http://127.0.0.1:8000/analysisTool/getMarket', {
         params: {
-          startDate: a,
-          endDate: b,
+          startDate: "2020-03-01",
+          endDate: "2020-06-01",
           ticker: "000002.SZ"
         }
       })
       .then((response) => {
         alert("ying")
         console.log(response)
+        this.drawMarket(response["data"]["marketData"],"testChart4","testChart5")
       })
       .catch(function (error) {
         console.log(error)
@@ -132,36 +137,126 @@ export default {
       .then((response) => {
         alert("ying")
         console.log(response)
+        this.drawTransaction(response["data"]["transactionData"],"testChart2","testChart3")
+
       })
       .catch(function (error) {
         console.log(error)
       })
     },
 
-    drawLine: function(dataInput,picID) {
+    drawPortfolio: function(dataInput,picID) {
       var option = {
         title: {
-          text:"yingying"
+          text:"Portfolio Value"
         },
         tooltip: {},
         legend: {},
         xAxis: {type: "time"},
         yAxis: {},
         dataset: {
-          // 这里指定了维度名的顺序，从而可以利用默认的维度到坐标轴的映射。
-          // 如果不指定 dimensions，也可以通过指定 series.encode 完成映射，参见后文。
-          dimensions: ["trade_day_id__trade_date","total_value"],
           source: eval(dataInput),
         },
-        series:  [{type: 'line'}],
+        series:  [{
+          type: 'line',
+          encode: {
+            x: "Date",
+            y: "Value"
+          }
+        }],
       };
       console.log(option)
       echarts.init(document.getElementById(picID)).setOption(option);
     },
 
     drawTransaction: function(dataInput,picID1,picID2) {
+      var option = {
+        title: {
+          text:"Return in percentage"
+        },
+        tooltip: {},
+        legend: {},
+        xAxis: {type: "time"},
+        yAxis: {},
+        dataset: {
+          source: eval(dataInput),
+        },
+        series:  [{
+          type: 'line',
+          encode: {
+            x: "Date",
+            y: "PercentageReturn"
+          }
+        }],
+      };
+      echarts.init(document.getElementById(picID1)).setOption(option);
+
+      var option = {
+        title: {
+          text:"Position"
+        },
+        tooltip: {},
+        legend: {},
+        xAxis: {type: "time"},
+        yAxis: {},
+        dataset: {
+          source: eval(dataInput),
+        },
+        series:  [{
+          type: 'bar',
+          encode: {
+            x: "Date",
+            y: "Position"
+          }
+        }],
+      };
+      echarts.init(document.getElementById(picID2)).setOption(option);
 
     },
+
+    drawMarket: function(dataInput,picID1,picID2) {
+      var option = {
+        title: {
+          text:"Market Price"
+        },
+        tooltip: {},
+        legend: {},
+        xAxis: {type: "time"},
+        yAxis: {},
+        dataset: {
+          source: eval(dataInput),
+        },
+        series:  [{
+          type: 'candlestick',
+          encode: {
+            x: "Date",
+            y: ["open","close","low","high"]
+          }
+        }],
+      };
+      echarts.init(document.getElementById(picID1)).setOption(option);
+
+      var option = {
+        title: {
+          text:"Volume"
+        },
+        tooltip: {},
+        legend: {},
+        xAxis: {type: "time"},
+        yAxis: {},
+        dataset: {
+          source: eval(dataInput),
+        },
+        series:  [{
+          type: 'bar',
+          encode: {
+            x: "Date",
+            y: ["Volume"]
+          }
+        }],
+      };
+      echarts.init(document.getElementById(picID2)).setOption(option);
+    }
   }
 }
 </script>
