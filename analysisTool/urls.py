@@ -21,4 +21,6 @@ urlpatterns = [
 url(r'getPortfolio$', views.getPortfolioData, ),
 url(r'getMarket$', views.getMarketData, ),
 url(r'getTransaction$', views.getTransactionData, ),
+url(r'upload$', views.setTransactions, ),
+url(r'getBookList$', views.getBookList, ),
 ]

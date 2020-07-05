@@ -8,10 +8,12 @@ import VueAxios from 'vue-axios'
 import App from './App'
 import router from './router'
 import qs from 'qs'
+import Message from 'element-ui'
 
 
 Vue.prototype.$qs = qs;
 Vue.config.productionTip = false
+
 
 Vue.use(ElementUI);
 Vue.use(VueAxios,axios);

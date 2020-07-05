@@ -8,12 +8,15 @@ import datetime
 from django.db.models import Sum
 from django.db.models import F
 
-class DateEncoder(json.JSONEncoder):
+
+class MyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
             return obj.strftime('%Y-%m-%d %H:%M:%S')
         elif isinstance(obj, datetime.date):
             return obj.strftime("%Y-%m-%d")
+        elif isinstance(obj, bytes):
+            return str(obj, encoding='utf-8');
         else:
             return json.JSONEncoder.default(self, obj)
 
@@ -35,7 +38,7 @@ def getPortfolioData(request):
         trade_date__range=(startDate,endDate))
         .values_list("trade_date",flat=True)
         .order_by("trade_date")
-        ), cls=DateEncoder)
+        ), cls=MyEncoder)
 
         data = {}
         for book in books:
@@ -47,7 +50,7 @@ def getPortfolioData(request):
             .values("Date")
             .order_by("trade_day_id")
             .annotate(Value=Sum("value")))
-            data[book] = json.dumps(list(positions), cls=DateEncoder)
+            data[book] = json.dumps(list(positions), cls=MyEncoder)
         response["performance"] = data
         # 这种写法返回的数据在前端会被字符串括起来，需要eval
         response['msg'] = 'success'
@@ -77,7 +80,7 @@ def getMarketData(request):
         .values("Date","open","close","high","low","Volume")
         .order_by("trade_day_id"))
 
-        response['marketData'] = json.dumps(list(marketData), cls=DateEncoder)
+        response['marketData'] = json.dumps(list(marketData), cls=MyEncoder)
         response['msg'] = 'success'
         response['error_num'] = 0
     except  Exception as e:
@@ -109,7 +112,72 @@ def getTransactionData(request):
         .values('Date',"Position","PercentageReturn")
         .order_by("trade_day_id"))
 
-        response["transactionData"] = json.dumps(list(positions), cls=DateEncoder)
+        response["transactionData"] = json.dumps(list(positions), cls=MyEncoder)
+        response['msg'] = 'success'
+        response['error_num'] = 0
+    except  Exception as e:
+        response['msg'] = str(e)
+        response['error_num'] = 1
+    return JsonResponse(response)
+
+
+@require_http_methods(["POST"])
+def setTransactions(request):
+    response = {}
+    try:
+        file = request.FILES.get('file')
+        # response['test1'] = file.name
+        # realfile = file.read().decode("utf-8")
+        # response["test3"] = realfile
+
+        # testdata = []
+        skipFirstLine = True
+        for line in file:
+            if skipFirstLine:
+                skipFirstLine = False
+                Position.objects.all().delete()
+                statements = []
+                continue
+            infomation = str(line.split()[0], encoding = "utf-8").split(",")
+            # testdata.append(infomation)
+            value = infomation[4] if infomation[4]!="" else 0
+            return_field = infomation[6] if infomation[6]!="" else 0
+            pct_return = infomation[7] if infomation[7]!="" else 0
+            trade_day_id = TradeCalendar.objects.get(trade_date=infomation[2]).id
+            # testdata.append(trade_day_id)
+            statements.append(Position(
+            book=infomation[0],
+            ts_code=infomation[1],
+            trade_day_id=trade_day_id,
+            position=infomation[3],
+            value=value,
+            wavg_cost=infomation[5],
+            return_field=return_field,
+            pct_return=pct_return,
+            ))
+        Position.objects.bulk_create(statements)
+
+        # response["test2"] = json.dumps(testdata, cls=MyEncoder)
+
+
+
+        response['msg'] = 'success'
+        response['error_num'] = 0
+    except  Exception as e:
+        response['msg'] = str(e)
+        response['error_num'] = 1
+    return JsonResponse(response)
+
+
+@require_http_methods(["GET"])
+def getBookList(request):
+    response = {}
+    try:
+
+        books = (Position.objects.all().values_list("book",flat=True).distinct()
+        .order_by("book"))
+
+        response["books"] = json.dumps(list(books), cls=MyEncoder)
         response['msg'] = 'success'
         response['error_num'] = 0
     except  Exception as e:

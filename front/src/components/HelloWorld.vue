@@ -13,6 +13,11 @@
         <button class="btn btn-default">Start testing</button>
       </router-link>
     </li>
+    <li>
+      <router-link to="/upload">
+        <button class="btn btn-default">Upload csv</button>
+      </router-link>
+    </li>
   </ul>
   <h2>Test</h2>
 
@@ -28,6 +33,7 @@
   <br><br>
   <el-button type="primary" @click="getMarket(testA,testB)" style="float:left; margin: 2px;">Market</el-button>
   <el-button type="primary" @click="getTransaction(testA,testB)" style="float:left; margin: 2px;">Transaction</el-button>
+  <el-button type="primary" @click="getBookList" style="float:left; margin: 2px;">Getlist</el-button>
   <br><br><br>
 
   <div id="testChart1" style="width: 600px;height:400px;"></div>
@@ -55,6 +61,7 @@ export default {
       testA: 0,
       testB: 0,
       testout: 0,
+      bookList: []
     }
   },
   methods: {
@@ -88,8 +95,8 @@ export default {
     getPortfolio: function(a,b) {
       this.axios.get('http://127.0.0.1:8000/analysisTool/getPortfolio', {
         params: {
-          startDate: "2020-03-01",
-          endDate: "2020-06-01",
+          startDate: "2019-06-01",
+          endDate: "2019-09-01",
           books: ["jx","yz"]
         },
         paramsSerializer: params => {
@@ -102,7 +109,7 @@ export default {
         this.drawPortfolio(response["data"]["performance"]["yz"],"testChart1")
         console.log(response)
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log(error)
       })
     },
@@ -128,8 +135,8 @@ export default {
     getTransaction: function(a,b) {
       this.axios.get('http://127.0.0.1:8000/analysisTool/getTransaction', {
         params: {
-          startDate: "2020-03-01",
-          endDate: "2020-06-01",
+          startDate: "2019-06-01",
+          endDate: "2019-09-01",
           book: "jx",
           ticker: "000002.SZ"
         }
@@ -256,7 +263,18 @@ export default {
         }],
       };
       echarts.init(document.getElementById(picID2)).setOption(option);
-    }
+    },
+
+    getBookList: function(a,b) {
+      this.axios.get('http://127.0.0.1:8000/analysisTool/getBookList')
+      .then((response) => {
+
+        console.log(response)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    },
   }
 }
 </script>
