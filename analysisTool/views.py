@@ -7,6 +7,7 @@ from .models import *
 import datetime
 from django.db.models import Sum
 from django.db.models import F
+from analysisTool import tradeRecorder
 
 
 class MyEncoder(json.JSONEncoder):
@@ -37,7 +38,7 @@ def getPortfolioData(request):
         response["dates"] = json.dumps(list(TradeCalendar.objects.filter(
         trade_date__range=(startDate,endDate))
         .values_list("trade_date",flat=True)
-        .order_by("trade_date")
+        .order_by("id")
         ), cls=MyEncoder)
 
         data = {}
@@ -52,6 +53,19 @@ def getPortfolioData(request):
             .annotate(Value=Sum("value")))
             data[book] = json.dumps(list(positions), cls=MyEncoder)
         response["performance"] = data
+
+        data = {}
+        for book in books:
+            positions = (Position.objects.filter(
+            trade_day_id__trade_date__range=(startDate,endDate),
+            book = book
+            )
+            .annotate(Date=F("trade_day_id__trade_date"))
+            .values_list("Date")
+            .order_by("trade_day_id")
+            .annotate(Value=Sum("value")))
+            data[book] = json.dumps(list(positions), cls=MyEncoder)
+        response["performanceTuple"] = data
         # 这种写法返回的数据在前端会被字符串括起来，需要eval
         response['msg'] = 'success'
         response['error_num'] = 0
@@ -131,7 +145,10 @@ def setTransactions(request):
         # response["test3"] = realfile
 
         # testdata = []
+        tradeRecorder.setDates()
         skipFirstLine = True
+
+
         for line in file:
             if skipFirstLine:
                 skipFirstLine = False
@@ -143,12 +160,11 @@ def setTransactions(request):
             value = infomation[4] if infomation[4]!="" else 0
             return_field = infomation[6] if infomation[6]!="" else 0
             pct_return = infomation[7] if infomation[7]!="" else 0
-            trade_day_id = TradeCalendar.objects.get(trade_date=infomation[2]).id
             # testdata.append(trade_day_id)
             statements.append(Position(
             book=infomation[0],
             ts_code=infomation[1],
-            trade_day_id=trade_day_id,
+            trade_day_id=tradeRecorder.tradeID[infomation[2]],
             position=infomation[3],
             value=value,
             wavg_cost=infomation[5],

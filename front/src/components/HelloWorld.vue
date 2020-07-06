@@ -34,7 +34,7 @@
   <el-button type="primary" @click="getMarket(testA,testB)" style="float:left; margin: 2px;">Market</el-button>
   <el-button type="primary" @click="getTransaction(testA,testB)" style="float:left; margin: 2px;">Transaction</el-button>
   <el-button type="primary" @click="getBookList" style="float:left; margin: 2px;">Getlist</el-button>
-  <br><br><br>
+
 
   <div id="testChart1" style="width: 600px;height:400px;"></div>
   <br><br><br>
@@ -106,7 +106,8 @@ export default {
       .then((response) => {
         alert("ying")
         // console.log(response["data"]["performance"]["yz"])
-        this.drawPortfolio(response["data"]["performance"]["yz"],"testChart1")
+        // this.drawPortfolio(response["data"]["performance"],"testChart1")
+        this.drawPortfolio(response["data"]["dates"],response["data"]["performanceTuple"],"testChart1")
         console.log(response)
       })
       .catch((error) => {
@@ -152,7 +153,33 @@ export default {
       })
     },
 
-    drawPortfolio: function(dataInput,picID) {
+    drawPortfolio: function(dates,dataInputObj,picID) {
+      var series = []
+      for (let book in dataInputObj) {
+        series.push({
+          name: book,
+          type: "line",
+          data: eval(dataInputObj[book])
+        })
+      }
+      var option = {
+        title: {
+          text:"Portfolio Value"
+        },
+        tooltip: {},
+        legend: {},
+        xAxis: {
+          // type: "time",
+          data: eval(dates)
+        },
+        yAxis: {},
+        series: series
+      };
+      console.log(option)
+      echarts.init(document.getElementById(picID)).setOption(option);
+    },
+
+    drawPortfoliobackup: function(dataInput,picID) {
       var option = {
         title: {
           text:"Portfolio Value"
@@ -275,6 +302,8 @@ export default {
         console.log(error)
       })
     },
+
+
   }
 }
 </script>
