@@ -1,10 +1,18 @@
 <template>
 <div class="uploader">
-  <h1>Backtesting Page</h1>
-  <p>yingyingying</p>
   <router-link to="/">
-    <button class="btn btn-default">Home</button>
+    <button class="btn btn-primary">Back to homepage</button><br><br>
   </router-link>
+  <h1>Uploading Page</h1>
+  <div class="col-sm-8 text-center"><br><br><br>
+    <div id="appin">
+      <p>Upload .csv file to add transaction record</p><br><br>
+      
+    </div>
+  </div>
+  <!-- <router-link to="/">
+    <button class="btn btn-default">Back to homepage</button>
+  </router-link> -->
 
   <el-upload
     class="upload-demo"
@@ -76,7 +84,7 @@ export default {
         })
       }
       else{
-        this.$message.error('上传文件不能为空');
+        this.$message.error('Cannot upload empty file!');
       }
     },
 
@@ -111,5 +119,14 @@ li {
 
 a {
   color: #42b983;
+}
+
+.container{
+  background-color: bisque;
+}
+
+img{
+  height:150px;
+  width:200px;
 }
 </style>

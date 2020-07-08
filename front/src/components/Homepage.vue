@@ -1,6 +1,6 @@
 <template>
-<div class="hello">
-  <h1>{{ msg }}</h1>
+<div class="Homepage">
+  <h1>Backtesting Tool By feizhai</h1>
   <h2>Essential Links</h2>
   <ul>
     <li>
@@ -11,6 +11,11 @@
     <li>
       <router-link to="/backtesting">
         <button class="btn btn-default">Start testing</button>
+      </router-link>
+    </li>
+    <li>
+      <router-link to="/backtesting">
+        Start testing
       </router-link>
     </li>
     <li>
@@ -45,6 +50,34 @@
   <div id="testChart4" style="width: 600px;height:400px;"></div>
   <br><br><br>
   <div id="testChart5" style="width: 600px;height:400px;"></div>
+
+  <br><br><br><br><br>
+
+  <p>Choose Your stock plan and submit first, then go to next page choosing your strategy, start time and end time</p>
+  <router-link to="/backtesting">
+   <button class="btn btn-primary">Start Backtesting</button><br><br>
+  </router-link>
+
+
+  <br>
+
+
+  <p>If you already have your transaction history and just want to visualize it, click here to upload your data as a csv file.</p>
+  <router-link to="/upload">
+    <button class="btn btn-primary">Upload page</button>&nbsp; &nbsp;
+  </router-link>
+
+
+
+  <div class="col-sm-8 text-center"><br><br><br>
+    <div id="appin">
+      <br><br>
+      <h5>See related reports and graphs here</h5>
+      <router-link to="/search">
+        <button class="btn btn-primary">See graphs</button><br><br>
+      </router-link>
+    </div>
+  </div>
 
 </div>
 

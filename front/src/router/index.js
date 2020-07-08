@@ -1,8 +1,14 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+import Homepage from '@/components/Homepage'
 import Backtesting from '@/components/Backtesting'
-import uploader from '@/components/uploader'
+import StockPool from '@/components/StockPool'
+import Report from '@/components/Report'
+import Uploader from '@/components/Uploader'
+import Search from '@/components/Search'
+import Portfolio from '@/components/Portfolio'
+import Market from '@/components/Market'
+import Transaction from '@/components/Transaction'
 
 Vue.use(Router)
 
@@ -10,8 +16,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
+      name: 'Home',
+      component: Homepage
     },
     {
       path:'/backtesting',
@@ -20,8 +26,39 @@ export default new Router({
     },
     {
       path: '/upload',
-      name: 'uploader',
-      component: uploader
+      name: 'Uploader',
+      component: Uploader
     },
+    {
+      path: '/pool',
+      name: 'StockPool',
+      component: StockPool
+    },
+    {
+      path:'/search',
+      name:'Search',
+      component: Search
+    },
+    {
+      path:'/report',
+      name:'Report',
+      component: Report
+    },
+    {
+      path:'/portfolio',
+      name:'Portfolio',
+      component: Portfolio
+    },
+    {
+      path:'/market',
+      name:'Market',
+      component: Market
+    },
+    {
+      path:'/transaction',
+      name:'Transaciton',
+      component: Transaction
+    },
+
   ]
 })

@@ -1,15 +1,36 @@
 <template>
-  <div class="userInput">
+  <div class="backtesting">
+    <router-link to="/">
+      <button class="btn btn-primary">Back to homepage</button><br><br>
+    </router-link>
+    <div class="container">
+    <div class="row">
+      <div class="col-sm-3 text-center">
+        <br><img src="../assets/profile.jpg">
+      </div>
+      <div class="col-sm-8 text-center"><br><br><br>
+        <div id="appin">
+          <h4>Choose your strategy, start time and end time with your selected stock plan</h4><br><br>
+        </div>
+      </div>
+    </div>
+    </div><br>
     <h1>Backtesting Page</h1>
-    <p>yingyingying</p>
-    <input type="text" id="strategy" v-model="strategy" placeholder="Write strategy" />
-    <input type="text" id="startDate" v-model="startDate" placeholder="Set start date" />
-    <input type="text" id="endDate" v-model="endDate" placeholder="Set end date" />
-    <br>
-    <p>二天在这做一个可以添加股票池的功能，默认是用市面上所有股票</p>
-    <button @click="review">Start testing</button>
-    <p id="response">{{response}}</p>
-    <p id="report"></p>
+    <input type="text" id="strategy" v-model="strategy" placeholder="Write strategy" />&nbsp; &nbsp;
+    <select style="width:200px;" v-model="selectStrategy" @change='getDefaultStrategy'>
+　　        <option disabled value=''>--Select default strategy--</option>
+　     　   <option v-for="item in optList">{{ item }}</option>
+    </select>
+    <br><br><input type="text" id="startDate" v-model="startDate" placeholder="Set start date" />&nbsp; &nbsp;<a>yyyy-mm-dd</a>
+    <br><br><input type="text" id="endDate" v-model="endDate" placeholder="Set end date" />&nbsp; &nbsp;<a>yyyy-mm-dd</a>
+    <br><br>
+    <router-link to="/pool">
+      <button class="btn btn-secondary">Select stock plan</button>
+    </router-link>
+    <button class="btn btn-secondary" @click="test">Start testing</button>
+
+
+
   </div>
 </template>
 
@@ -19,24 +40,20 @@ export default {
   data () {
     return {
       msg: 'Backtesting page',
-      response: ""
+      strategy: "",
+      startDate: "",
+      endDate: "",
+      optList: ['Strategy A', 'Strategy B'],
+      selectStrategy: ""
     }
   },
   methods: {
-    review: function() {
-      alert("starting with " + this.strategy + " from " + this.startDate + " to " + this.endDate)
-      this.response = "ok";
-      if (this.response=="ok") {
-        // alert("1");
-        this.showReport();
-      }
-      else {
-        this.response="rnm";
-      }
+    test: function() {
+      this.$router.push({name:"Report",query:{StartDate : this.startDate,
+                                              EndDate : this.endDate}})
     },
-    showReport: function() {
-      // alert("2");
-      document.getElementById("report").innerHTML = "Report.jpg using" + this.strategy + " , " + this.startDate + " , " + this.endDate;
+    getDefaultStrategy: function(){
+
     }
   }
 }
@@ -55,7 +72,14 @@ li {
   display: inline-block;
   margin: 0 10px;
 }
-a {
-  color: #42b983;
+
+.container{
+  background-color: bisque;
 }
+
+img{
+  height:150px;
+  width:200px;
+}
+
 </style>
