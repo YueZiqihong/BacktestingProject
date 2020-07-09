@@ -1,18 +1,13 @@
 <template>
 <div class="uploader">
-  <router-link to="/">
-    <button class="btn btn-primary">Back to homepage</button><br><br>
-  </router-link>
+
   <h1>Uploading Page</h1>
   <div class="col-sm-8 text-center"><br><br><br>
-    <div id="appin">
-      <p>Upload .csv file to add transaction record</p><br><br>
-      
-    </div>
+    <p>If you already have your transaction records, you can upload your .csv file here directly.</p><br>
+    <h2>File format</h2>
+    <p>The csv file should be separated by comma; the first row is column names in the following order: book name, stock ticker,	date,	position,	value, average cost, return, percentage return. Data start at the second row.
+    </p><br>
   </div>
-  <!-- <router-link to="/">
-    <button class="btn btn-default">Back to homepage</button>
-  </router-link> -->
 
   <el-upload
     class="upload-demo"

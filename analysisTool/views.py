@@ -200,3 +200,31 @@ def getBookList(request):
         response['msg'] = str(e)
         response['error_num'] = 1
     return JsonResponse(response)
+
+
+@require_http_methods(["GET"])
+def getCurrentStockPrice(request):
+    response = {}
+    try:
+
+        date = datetime.date(2020,6,1)
+
+        priceData = (Market.objects.filter(
+        trade_day_id__trade_date=(date),
+        ts_code="000002.SZ"
+        )
+        .annotate(
+        ticker = F("ts_code"),
+        date = F("trade_day_id__trade_date"),
+        volume = F("vol"),        
+        )
+        .values("ticker","date","open","close","high","low","volume"))
+
+
+        response['price'] = json.dumps(list(priceData), cls=MyEncoder)
+        response['msg'] = 'success'
+        response['error_num'] = 0
+    except  Exception as e:
+        response['msg'] = str(e)
+        response['error_num'] = 1
+    return JsonResponse(response)

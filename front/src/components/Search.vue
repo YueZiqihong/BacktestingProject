@@ -1,30 +1,15 @@
 <template>
   <div class="search">
-    <router-link to="/">
-      <button class="btn btn-primary">Back to homepage</button><br><br>
-    </router-link>
+    <h1>Quick Navigation</h1>
     <div class="container">
-    <div class="row">
-      <div class="col-sm-3 text-center">
-        <br><br><img src="../assets/profile.jpg">
-      </div>
-      <div class="col-sm-8 text-center"><br><br><br>
-        <div id="appin">
-          <h4>Choose the following three aspects to search</h4><br><br>
-
-        </div>
-      </div>
-    </div>
+      <p>Looking for stock price in certain time period? Click <router-link to="/market">here</router-link>.<br><br>
+      </p>
+      <p>Review your protfolio performance <router-link to="/portfolio">here</router-link>.<br><br>
+      </p>
+      <p>Review any particular stock you traded <router-link to="/market">here</router-link>.<br><br>
+      </p>
     </div><br><br>
-    <router-link to="/portfolio">
-      <button class="btn btn-secondary">Search Portfolio</button>&nbsp;
-    </router-link><br><br>
-    <router-link to="/market">
-      <button class="btn btn-secondary" >Search Market</button>&nbsp;
-    </router-link><br><br>
-    <router-link to="/transaction">
-      <button class="btn btn-secondary">Search Transaction</button>
-    </router-link>
+
   </div>
 </template>
 

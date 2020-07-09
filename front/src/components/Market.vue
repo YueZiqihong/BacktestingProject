@@ -1,40 +1,21 @@
 <template>
   <div class="market">
-    <router-link to="/">
-      <button class="btn btn-primary">Back to homepage</button><br><br>
-    </router-link>
     <div class="container">
-    <div class="row">
-      <div class="col-sm-3 text-center">
-        <br><br><img src="../assets/profile.jpg">
-      </div>
-      <div class="col-sm-8 text-center"><br><br><br>
-        <div id="appin">
-          <h4>Search stock candlestick chart with start time, end time and stock tinker</h4><br><br>
-          <router-link to="/search">
-            <button class="btn btn-primary">Back to search interface</button><br><br>
-          </router-link>
-        </div>
-      </div>
+      <h1>Market Viewer</h1>
+      <p>Here you can search for market prices of a specific stock within specified time period. Candlestick views will be avaliable.</p>
+      <router-link to="/search">
+        Other avaliable graphs<br><br>
+      </router-link>
     </div>
-    </div>
+
     <br><br><a>Set start date (yyyy-mm-dd)</a>
     <input type="text" v-model="startDate" placeholder="Input start date" />&nbsp; &nbsp;
     <a>Set end date (yyyy-mm-dd)</a>
     <input type="text" v-model="endDate" placeholder="Input end date" />&nbsp; &nbsp;
-    <a>Set stock tinker</a>
-    <input type="text" v-model="stockTinker" placeholder="Input stock tinker" /><br><br>
+    <a>Set stock ticker</a>
+    <input type="text" v-model="stockticker" placeholder="Input stock ticker" /><br><br>
     <button class="btn btn-secondary" @click="search">Search</button>&nbsp;<br><br>
-    <!-- <div class="container"> -->
-    <!-- <div class="row">
-      <div class="col-sm-5 text-center">
-        <div id="testChart1" style="width: 500px;height:400px;"></div>
-      </div>
-      <div class="col-sm-5 text-center">
-        <div id="testChart2" style="width: 500px;height:400px;"></div>
-      </div>
-    </div>
-    </div> -->
+
     <div id="testChart1" style="width:500px;height:400px;display:inline;"></div>
     <div id="testChart2" style="width:500px;height:400px;display:inline;"></div>
   </div>
@@ -49,7 +30,7 @@ export default {
     return {
       startDate:"",
       endDate:"",
-      stockTinker:""
+      stockticker:this.$route.params.id,
     }
   },
   methods: {
@@ -58,7 +39,7 @@ export default {
         params: {
           startDate: this.startDate,
           endDate: this.endDate,
-          ticker: this.stockTinker
+          ticker: this.stockticker
         }
       })
       .then((response) => {

@@ -1,34 +1,34 @@
 <template>
 <div class="Homepage">
   <h1>Backtesting Tool By feizhai</h1>
-  <h2>Essential Links</h2>
-  <ul>
-    <li>
-      <a href="https://www.google.com" target="_blank">
-        谷歌
-      </a>
-    </li>
-    <li>
-      <router-link to="/backtesting">
-        <button class="btn btn-default">Start testing</button>
-      </router-link>
-    </li>
-    <li>
-      <router-link to="/backtesting">
-        Start testing
-      </router-link>
-    </li>
-    <li>
-      <router-link to="/upload">
-        <button class="btn btn-default">Upload csv</button>
-      </router-link>
-    </li>
-  </ul>
-  <h2>Test</h2>
+  <h2>About This Page</h2>
+  <p>This is a virtual backtesting system for China's stock share market. You can test your trading strtegies here and take advantage of the visualized transaction history to analyze your strategies.</p>
+
+  <br>
+  <p>Start writing up your strategy here:
+    <router-link to="/backtesting">
+      Get started
+    </router-link>
+  </p>
+
+  <br>
+  <h2>Upload your transaction history</h2>
+  <p>Already have your transaction history and looking for a quick visualization tool? You can upload your transaction records as a csv file here:
+    <router-link to="/upload">
+      Upload
+    </router-link>
+    .
+  </p>
+
+  <br>
+  <h2>Graphs</h2>
+  <p>After you tested your strategy or you uploaded your transaction records, you can view the performance of both your <router-link to="/portfolio">portfolio</router-link> and <router-link to="/transaction">specific stock</router-link>. </p>
+  <br>
+  <p>For your reference, you can view stock prices <router-link to="/market">here</router-link></p>
 
 
 
-  <el-input v-model="testA" placeholder="a" style="display:inline-table; width: 30%; float:left"></el-input>
+  <!-- <el-input v-model="testA" placeholder="a" style="display:inline-table; width: 30%; float:left"></el-input>
   <el-input v-model="testB" placeholder="b" style="display:inline-table; width: 30%; float:left"></el-input>
   <el-button type="primary" @click="test(testA,testB)" style="float:left; margin: 2px;">test</el-button>
   <p>{{testout}}</p>
@@ -77,7 +77,7 @@
         <button class="btn btn-primary">See graphs</button><br><br>
       </router-link>
     </div>
-  </div>
+  </div> -->
 
 </div>
 
