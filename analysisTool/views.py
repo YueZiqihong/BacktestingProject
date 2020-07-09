@@ -210,13 +210,12 @@ def getCurrentStockPrice(request):
         date = datetime.date(2020,6,1)
 
         priceData = (Market.objects.filter(
-        trade_day_id__trade_date=(date),
-        ts_code="000002.SZ"
+        trade_day_id__trade_date=(date),        
         )
         .annotate(
         ticker = F("ts_code"),
         date = F("trade_day_id__trade_date"),
-        volume = F("vol"),        
+        volume = F("vol"),
         )
         .values("ticker","date","open","close","high","low","volume"))
 
