@@ -1,33 +1,47 @@
 <template>
   <div class="backtesting">
-    <router-link to="/">
-      <button class="btn btn-primary">Back to homepage</button><br><br>
-    </router-link>
     <div class="container">
-    <div class="row">
-      <div class="col-sm-3 text-center">
-        <br><img src="../assets/profile.jpg">
-      </div>
-      <div class="col-sm-8 text-center"><br><br><br>
-        <div id="appin">
-          <h4>Choose your strategy, start time and end time with your selected stock plan</h4><br><br>
-        </div>
-      </div>
-    </div>
+    <h1>Customize your Strategy</h1>
     </div><br>
-    <h1>Backtesting Page</h1>
-    <input type="text" id="strategy" v-model="strategy" placeholder="Write strategy" />&nbsp; &nbsp;
+    <h2>Strategy</h2>
+    <el-input
+      type="text"
+      size="medium"
+      placeholder="Write your strategy"
+      v-model="strategy"
+      clearable
+      style="width:600px">
+    </el-input>
+
+    <!-- <el-select style="width:200px;" v-model="accountName" multiple placeholder="One or more">
+　     <el-option v-for="item in optList":key="item.value":value="item.value"></el-option>
+    </el-select><br><br> -->
+
     <select style="width:200px;" v-model="selectStrategy" @change='getDefaultStrategy'>
 　　        <option disabled value=''>--Select default strategy--</option>
 　     　   <option v-for="item in optList">{{ item }}</option>
     </select>
-    <br><br><input type="text" id="startDate" v-model="startDate" placeholder="Set start date" />&nbsp; &nbsp;<a>yyyy-mm-dd</a>
-    <br><br><input type="text" id="endDate" v-model="endDate" placeholder="Set end date" />&nbsp; &nbsp;<a>yyyy-mm-dd</a>
+
+    <br><br>
+    <div class="block">
+      <span class="demonstration">Time period:</span>
+      <el-date-picker
+        v-model="dateList"
+        type="daterange"
+        value-format="yyyy-MM-dd"
+        range-separator="To"
+        start-placeholder="Start Date"
+        end-placeholder="End Date">
+      </el-date-picker>
+    </div>
+
     <br><br>
     <router-link to="/pool">
-      <button class="btn btn-secondary">Select stock plan</button>
+      <el-button style="margin: 2px;">Customize Stock Pool</el-button>
     </router-link>
-    <button class="btn btn-secondary" @click="test">Start testing</button>
+    <br>
+    <el-button @click="test" style="margin: 2px;">Start testing</el-button>
+
 
 
 
@@ -39,10 +53,8 @@ export default {
   name: 'Backtesting',
   data () {
     return {
-      msg: 'Backtesting page',
       strategy: "",
-      startDate: "",
-      endDate: "",
+      dateList: "",
       optList: ['Strategy A', 'Strategy B'],
       selectStrategy: ""
     }
@@ -54,7 +66,7 @@ export default {
     },
     getDefaultStrategy: function(){
 
-    }
+    },
   }
 }
 </script>
@@ -63,6 +75,7 @@ export default {
 <style scoped>
 h1, h2 {
   font-weight: normal;
+  /* text-align: left; */
 }
 ul {
   list-style-type: none;

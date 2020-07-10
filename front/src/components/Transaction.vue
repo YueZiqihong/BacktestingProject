@@ -1,26 +1,42 @@
 <template>
   <div class="transaction">
     <div class="container">
-
       <h1>Transaction Analysis Tool</h1>
-      <p>Here you can review the performance of specific stock you traded.</p>
-      <router-link to="/search">
-        Other avaliable graphs<br><br>
-      </router-link>
+    </div>
+    <p>Here you can review the performance of specific stock you traded.</p>
+    <router-link to="/search">
+      Other avaliable graphs<br><br>
+    </router-link>
+
+    <div class="block">
+      <span class="demonstration">Time period:</span>
+      <el-date-picker
+        v-model="dateList"
+        type="daterange"
+        value-format="yyyy-MM-dd"
+        range-separator="To"
+        start-placeholder="Start Date"
+        end-placeholder="End Date">
+      </el-date-picker>
     </div>
 
-    <br><br><a>Set start date (yyyy-mm-dd)</a>
-    <input type="text" v-model="startDate" placeholder="Input start date" />&nbsp; &nbsp;
-    <a>Set end date (yyyy-mm-dd)</a>
-    <input type="text" v-model="endDate" placeholder="Input end date" />&nbsp; &nbsp;
-    <br><br><a>Select account name (only one)</a>
-    <select style="width:200px;" v-model="accountName" @change='selectAccountName($event)'>
-　　        <option disabled value=''>--Select account name--</option>
-　     　   <option v-for="item in optList">{{ item }}</option>
-    </select>
-    <a>Set stock ticker</a>
-    <input type="text" v-model="stockticker" placeholder="Input stock ticker" />&nbsp; &nbsp;
-    <button class="btn btn-secondary" @click="search">Search</button><br><br>
+    <p>Account:
+      <el-select style="width:200px;" v-model="accountName" placeholder="Select account">
+        <el-option v-for="item in optList":key="item.value":value="item.value"></el-option>
+      </el-select>
+    </p>
+
+    <p>Stock ticker:
+      <el-input
+        size="medium"
+        placeholder="Input stock ticker"
+        v-model="ticker"
+        clearable
+        style="width:300px">
+      </el-input>
+    </p>
+    <el-button @click="search" style="margin: 2px;">Search</el-button>
+    <br><br><br>
     <div id="testChart1" style="width:500px;height:400px;display:inline;"></div>
     <div id="testChart2" style="width:500px;height:400px;display:inline;"></div>
 
@@ -41,17 +57,19 @@ export default {
   name: 'Transaciton',
   data () {
     return {
-      startDate:"",
-      endDate:"",
+      dateList:"",
       accountName:"",
-      stockticker:"",
+      ticker:"",
       optList:[]
     }
   },
   mounted (){
     this.axios.get('http://127.0.0.1:8000/analysisTool/getBookList')
     .then((response) => {
-      this.optList=eval(response["data"]["books"])
+      var plst=eval(response["data"]["books"])
+      for(var i=0;i<plst.length;i++){
+        this.optList.push({"value":plst[i]})
+      }
     })
     .catch((error) => {
       console.log(error)
@@ -61,10 +79,10 @@ export default {
     search: function (){
       this.axios.get('http://127.0.0.1:8000/analysisTool/getTransaction', {
         params: {
-          startDate: this.startDate,
-          endDate: this.endDate,
+          startDate: this.dateList[0],
+          endDate: this.dateList[1],
           book: this.accountName,
-          ticker: this.stockticker
+          ticker: this.ticker
         }
       })
       .then((response) => {

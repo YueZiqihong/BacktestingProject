@@ -1,15 +1,15 @@
 <template>
   <div class="search">
-    <h1>Quick Navigation</h1>
-    <div class="container">
-      <p>Looking for stock price in certain time period? Click <router-link to="/market">here</router-link>.<br><br>
-      </p>
-      <p>Review your protfolio performance <router-link to="/portfolio">here</router-link>.<br><br>
-      </p>
-      <p>Review any particular stock you traded <router-link to="/market">here</router-link>.<br><br>
-      </p>
-    </div><br><br>
 
+    <div class="container">
+      <h1>Quick Navigation</h1>
+    </div><br><br>
+    <p>Looking for stock price in certain time period? Click <router-link to="/market">here</router-link>.<br><br>
+    </p>
+    <p>Review your protfolio performance <router-link to="/portfolio">here</router-link>.<br><br>
+    </p>
+    <p>Review any particular stock you traded <router-link to="/transaction">here</router-link>.<br><br>
+    </p>
   </div>
 </template>
 

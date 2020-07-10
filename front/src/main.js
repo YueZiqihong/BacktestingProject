@@ -9,13 +9,14 @@ import App from './App'
 import router from './router'
 import qs from 'qs'
 import Message from 'element-ui'
+import locale from 'element-ui/lib/locale/lang/en'
 // import 'bootstrap/dist/css/bootstrap.min.css'
 
 Vue.prototype.$qs = qs;
 Vue.config.productionTip = false
 
 
-Vue.use(ElementUI);
+Vue.use(ElementUI, {locale});
 Vue.use(VueAxios,axios);
 Vue.use(qs);
 

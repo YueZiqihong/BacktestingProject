@@ -2,22 +2,39 @@
   <div class="market">
     <div class="container">
       <h1>Market Viewer</h1>
-      <p>Here you can search for market prices of a specific stock within specified time period. Candlestick views will be avaliable.</p>
-      <router-link to="/search">
-        Other avaliable graphs<br><br>
-      </router-link>
     </div>
+    <p>Here you can search for market prices of a specific stock within specified time period. Candlestick views will be avaliable.</p>
+    <router-link to="/search">
+      Other avaliable graphs<br><br>
+    </router-link>
 
-    <br><br><a>Set start date (yyyy-mm-dd)</a>
-    <input type="text" v-model="startDate" placeholder="Input start date" />&nbsp; &nbsp;
-    <a>Set end date (yyyy-mm-dd)</a>
-    <input type="text" v-model="endDate" placeholder="Input end date" />&nbsp; &nbsp;
-    <a>Set stock ticker</a>
-    <input type="text" v-model="stockticker" placeholder="Input stock ticker" /><br><br>
-    <button class="btn btn-secondary" @click="search">Search</button>&nbsp;<br><br>
+    <div class="block">
+      <span class="demonstration">Time period:</span>
+      <el-date-picker
+        v-model="dateList"
+        type="daterange"
+        value-format="yyyy-MM-dd"
+        range-separator="To"
+        start-placeholder="Start Date"
+        end-placeholder="End Date">
+      </el-date-picker>
+    </div>
+    <p>Stock ticker:
+      <el-input
+        size="medium"
+        placeholder="Input stock ticker"
+        v-model="ticker"
+        clearable
+        style="width:300px">
+      </el-input>
+    </p>
+    <el-button @click="search" style="margin: 2px;">Search</el-button>
+
 
     <div id="testChart1" style="width:500px;height:400px;display:inline;"></div>
     <div id="testChart2" style="width:500px;height:400px;display:inline;"></div>
+    <br><br><br>
+
   </div>
 </template>
 
@@ -28,18 +45,17 @@ export default {
   name: 'Market',
   data () {
     return {
-      startDate:"",
-      endDate:"",
-      stockticker:this.$route.params.id,
+      dateList:"",
+      ticker:this.$route.params.id,
     }
   },
   methods: {
     search: function (){
       this.axios.get('http://127.0.0.1:8000/analysisTool/getMarket', {
         params: {
-          startDate: this.startDate,
-          endDate: this.endDate,
-          ticker: this.stockticker
+          startDate: this.dateList[0],
+          endDate: this.dateList[1],
+          ticker: this.ticker
         }
       })
       .then((response) => {
@@ -92,7 +108,8 @@ export default {
         }],
       };
       echarts.init(document.getElementById(picID2)).setOption(option);
-    }
+    },
+
   }
 }
 </script>

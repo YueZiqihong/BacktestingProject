@@ -26,7 +26,7 @@
   <br>
   <p>For your reference, you can view stock prices <router-link to="/market">here</router-link></p>
 
-
+  <el-button @click="test" style="margin: 2px;">test</el-button>
 
   <!-- <el-input v-model="testA" placeholder="a" style="display:inline-table; width: 30%; float:left"></el-input>
   <el-input v-model="testB" placeholder="b" style="display:inline-table; width: 30%; float:left"></el-input>
@@ -106,7 +106,7 @@ export default {
         }
       })
       .then((response) => {
-        this.testout = response.data.testdata
+        
         console.log(response)
       })
       .catch(function (error) {
@@ -114,16 +114,7 @@ export default {
       })
     },
 
-    test2: function(a,b) {
-      this.axios.get('http://127.0.0.1:8000/api/test2')
-      .then((response) => {
-        alert("rnm")
-        console.log(response)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
-    },
+
 
     getPortfolio: function(a,b) {
       this.axios.get('http://127.0.0.1:8000/analysisTool/getPortfolio', {
