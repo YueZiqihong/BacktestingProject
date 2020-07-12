@@ -55,15 +55,14 @@ export default {
   data () {
     return {
       strategy: "",
-      dateList: "",
+      dateList: ["2019-06-01","2020-06-01"],
       optList: ['Strategy A', 'Strategy B'],
       selectStrategy: "",
       poolInfo: this.$route.params.pool,
     }
   },
   methods: {
-    test: function() {
-
+    test: function() {      
       var stocks = []
       console.log(this.poolInfo.length)
       for (var i = 0; i < this.poolInfo.length; i++) {

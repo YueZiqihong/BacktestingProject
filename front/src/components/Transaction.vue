@@ -57,7 +57,7 @@ export default {
   name: 'Transaciton',
   data () {
     return {
-      dateList:"",
+      dateList: ["2019-06-01","2020-06-01"],
       accountName:"",
       ticker:"",
       optList:[]

@@ -41,7 +41,7 @@ export default {
   name: 'Portfolio',
   data () {
     return {
-      dateList:"",
+      dateList: ["2019-06-01","2020-06-01"],
       accountName:[],
       optList: []
     }

@@ -45,7 +45,7 @@ export default {
   name: 'Market',
   data () {
     return {
-      dateList: "",
+      dateList: ["2019-06-01","2020-06-01"],
       ticker: this.$route.params.id,
     }
   },
@@ -122,7 +122,7 @@ export default {
         legend: {},
         xAxis: {type: "category"},
         yAxis: {
-          type: "value",          
+          type: "value",
           max: "dataMax",
         },
         dataZoom: [{
