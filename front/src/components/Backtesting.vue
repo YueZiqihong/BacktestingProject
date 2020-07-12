@@ -40,8 +40,8 @@
       <el-button style="margin: 2px;">Customize Stock Pool</el-button>
     </router-link>
     <br>
-    <el-button @click="test" style="margin: 2px;">Start testing</el-button>
-
+    <el-button @click="test" style="margin: 2px; background-color: rgb(255,111,97)">Start testing</el-button>
+    <!-- {{poolInfo}} -->
 
 
 
@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import Message from 'element-ui'
 export default {
   name: 'Backtesting',
   data () {
@@ -56,13 +57,43 @@ export default {
       strategy: "",
       dateList: "",
       optList: ['Strategy A', 'Strategy B'],
-      selectStrategy: ""
+      selectStrategy: "",
+      poolInfo: this.$route.params.pool,
     }
   },
   methods: {
     test: function() {
-      this.$router.push({name:"Report",query:{StartDate : this.startDate,
-                                              EndDate : this.endDate}})
+
+      var stocks = []
+      console.log(this.poolInfo.length)
+      for (var i = 0; i < this.poolInfo.length; i++) {
+        stocks.push(this.poolInfo[i]["ticker"])
+      }
+
+      var data = this.$qs.stringify({
+        startDate: this.dateList[0],
+        endDate: this.dateList[1],
+        strategy: this.strategy,
+        stockPool: stocks,
+        // stockPool: ["000002.SZ","000001.SZ"],
+      }, {indices: false})
+
+      this.axios.post('http://127.0.0.1:8000/analysisTool/startBacktesting', data)
+      .then((response) => {
+
+
+        if (response['data']['error_num'] == 0) {
+          alert('Transaction data uploaded!')
+        }
+        else {
+          alert(response['data']['msg']);
+        }
+        console.log(response)
+      })
+      .catch(function (error) {
+        console.log(error)
+        this.$message.error(error);
+      })
     },
     getDefaultStrategy: function(){
 

@@ -12,7 +12,7 @@ from . import datamonger
 
 class PickyInvestor():
     def __init__(self):
-        self.datamonger = datamonger.Datamonger()
+        # self.datamonger = datamonger.Datamonger()
         self.hushen300df = ['600038.SH','600522.SH','600406.SH','601800.SH']
 #        self.hushen300df = self.datamonger.getHuShen300IndexComponent()
 

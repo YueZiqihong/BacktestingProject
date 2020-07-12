@@ -7,7 +7,7 @@ from .models import *
 import datetime
 from django.db.models import Sum
 from django.db.models import F
-from analysisTool import tradeRecorder
+from . import requestHandler
 
 
 class MyEncoder(json.JSONEncoder):
@@ -117,7 +117,7 @@ def getTransactionData(request):
         book = book,
         ts_code = ticker,
         )
-        # .values("trade_day_id__trade_date","book","position","value","return_field","pct_return")
+
         .annotate(
         Date=F('trade_day_id__trade_date'),
         Position=F('position'),
@@ -145,10 +145,8 @@ def setTransactions(request):
         # response["test3"] = realfile
 
         # testdata = []
-        tradeRecorder.setDates()
+        tradeID = requestHandler.getDateIDs()
         skipFirstLine = True
-
-
         for line in file:
             if skipFirstLine:
                 skipFirstLine = False
@@ -164,7 +162,7 @@ def setTransactions(request):
             statements.append(Position(
             book=infomation[0],
             ts_code=infomation[1],
-            trade_day_id=tradeRecorder.tradeID[infomation[2]],
+            trade_day_id=tradeID[infomation[2]],
             position=infomation[3],
             value=value,
             wavg_cost=infomation[5],
@@ -222,6 +220,28 @@ def getCurrentStockPrice(request):
 
 
         response['price'] = json.dumps(list(priceData), cls=MyEncoder)
+        response['msg'] = 'success'
+        response['error_num'] = 0
+    except  Exception as e:
+        response['msg'] = str(e)
+        response['error_num'] = 1
+    return JsonResponse(response)
+
+
+@require_http_methods(["POST"])
+def startBacktesting(request):
+    response = {}
+    try:
+        params = {}
+        params['startDate'] = datetime.datetime.strptime(request.POST.get("startDate"), '%Y-%m-%d').date().strftime('%Y%m%d')
+        params['endDate'] = datetime.datetime.strptime(request.POST.get("endDate"), '%Y-%m-%d').date().strftime('%Y%m%d')
+        params['stockPool'] = request.POST.getlist("stockPool")
+        params['strategy'] = request.POST.get("strategy")
+
+
+
+        response['test'] = requestHandler.simulate(params)
+
         response['msg'] = 'success'
         response['error_num'] = 0
     except  Exception as e:

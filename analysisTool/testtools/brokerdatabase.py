@@ -316,6 +316,7 @@ class Brokerdatabase():
         """
         使用csv文件储存每天的仓位.
         """
+        userPosition['trade_date'] = self.current_date
         if self.flag:
             userPosition.to_csv('hist_position.csv', index=True, mode = 'a', header = True)
             self.flag = False

@@ -24,4 +24,5 @@ url(r'getTransaction$', views.getTransactionData, ),
 url(r'upload$', views.setTransactions, ),
 url(r'getBookList$', views.getBookList, ),
 url(r'getCurrentStockPrice$', views.getCurrentStockPrice, ),
+url(r'startBacktesting$', views.startBacktesting, ),
 ]

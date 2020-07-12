@@ -37,8 +37,8 @@
     </p>
     <el-button @click="search" style="margin: 2px;">Search</el-button>
     <br><br><br>
-    <div id="testChart1" style="width:500px;height:400px;display:inline;"></div>
-    <div id="testChart2" style="width:500px;height:400px;display:inline;"></div>
+    <div id="testChart1" style="width:1000px;height:500px;margin: auto;"></div>
+    <div id="testChart2" style="width:1000px;height:500px;margin: auto;"></div>
 
 
 
@@ -97,49 +97,91 @@ export default {
     selectAccountName: function(event){
       this.accountName=event.target.value
     },
-    drawTransaction: function(dataInput,picID1,picID2) {
-    var option = {
-      title: {
-        text:"Return in percentage"
-      },
-      tooltip: {},
-      legend: {},
-      xAxis: {type: "time"},
-      yAxis: {},
-      dataset: {
-        source: eval(dataInput),
-      },
-      series:  [{
-        type: 'line',
-        encode: {
-          x: "Date",
-          y: "PercentageReturn"
-        }
-      }],
-    };
-    echarts.init(document.getElementById(picID1)).setOption(option);
 
-    var option = {
-      title: {
-        text:"Position"
-      },
-      tooltip: {},
-      legend: {},
-      xAxis: {type: "time"},
-      yAxis: {},
-      dataset: {
-        source: eval(dataInput),
-      },
-      series:  [{
-        type: 'bar',
-        encode: {
-          x: "Date",
-          y: "Position"
-        }
-      }],
-    };
-    echarts.init(document.getElementById(picID2)).setOption(option);
-   }
+    drawTransaction: function(dataInput,picID1,picID2) {
+      var option = {
+        title: {
+          text:"Return in percentage"
+        },
+        tooltip: {
+          trigger: "item",
+          triggerOn: 'mousemove|click',
+        },
+        legend: {},
+        xAxis: {type: "category"},
+        yAxis: {
+          type: "value",
+          min: "dataMin",
+          max: "dataMax",
+        },
+        dataZoom: [{
+          start: 0,
+          type: "inside"
+        }, {
+          start: 0
+        }],
+        dataset: {
+          source: eval(dataInput),
+        },
+        series:  [{
+          type: 'line',
+          encode: {
+            x: "Date",
+            y: "PercentageReturn"
+          }
+        }],
+      };
+      let chart = echarts.getInstanceByDom(document.getElementById(picID1))
+      if (chart) {
+        echarts.dispose(chart)
+      }
+      chart = echarts.getInstanceByDom(document.getElementById(picID1))
+      if (!chart) {
+        chart = echarts.init(document.getElementById(picID1)).setOption(option);
+      }
+
+      var option = {
+        title: {
+          text:"Position"
+        },
+        tooltip: {
+          trigger: "item",
+          triggerOn: 'mousemove|click',
+        },
+        legend: {},
+        xAxis: {type: "category"},
+        yAxis: {
+          type: "value",
+          min: "dataMin",
+          max: "dataMax",
+        },
+        dataZoom: [{
+          start: 0,
+          type: "inside"
+        }, {
+          start: 0
+        }],
+        dataset: {
+          source: eval(dataInput),
+        },
+        series:  [{
+          type: 'bar',
+          encode: {
+            x: "Date",
+            y: "Position"
+          }
+        }],
+      };
+      chart = echarts.getInstanceByDom(document.getElementById(picID2))
+      if (chart) {
+        echarts.dispose(chart)
+      }
+      chart = echarts.getInstanceByDom(document.getElementById(picID2))
+      if (!chart) {
+        chart = echarts.init(document.getElementById(picID2)).setOption(option);
+      }
+
+    },
   }
 }
 </script>

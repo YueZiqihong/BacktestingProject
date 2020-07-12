@@ -30,9 +30,9 @@
     </p>
     <el-button @click="search" style="margin: 2px;">Search</el-button>
 
+    <div id="testChart1" style="width:1000px;height:600px;margin: auto;"></div>
+    <div id="testChart2" style="width:1000px;height:600px;margin: auto;"></div>
 
-    <div id="testChart1" style="width:500px;height:400px;display:inline;"></div>
-    <div id="testChart2" style="width:500px;height:400px;display:inline;"></div>
     <br><br><br>
 
   </div>
@@ -45,8 +45,8 @@ export default {
   name: 'Market',
   data () {
     return {
-      dateList:"",
-      ticker:this.$route.params.id,
+      dateList: "",
+      ticker: this.$route.params.id,
     }
   },
   methods: {
@@ -71,31 +71,66 @@ export default {
         title: {
           text:"Market Price"
         },
-        tooltip: {},
+        tooltip: {
+          trigger: "item",
+          triggerOn: 'mousemove|click',
+        },
         legend: {},
-        xAxis: {type: "time"},
-        yAxis: {},
+        xAxis: {type: "category"},
+        yAxis: {
+          type: "value",
+          min: "dataMin",
+          max: "dataMax",
+        },
+        dataZoom: [{
+          start: 0,
+          type: "inside"
+        }, {
+          start: 0
+        }],
         dataset: {
           source: eval(dataInput),
         },
         series:  [{
           type: 'candlestick',
+          // dimensions: ['Date', 'open', 'close', 'low', 'high'],
           encode: {
             x: "Date",
-            y: ["open","close","low","high"]
-          }
+            y: ["open","close","low","high"],
+            tooltip: ["open","close","low","high"],
+          },
+
         }],
       };
-      echarts.init(document.getElementById(picID1)).setOption(option);
+      let chart = echarts.getInstanceByDom(document.getElementById(picID1))
+      if (chart) {
+        echarts.dispose(chart)
+      }
+      chart = echarts.getInstanceByDom(document.getElementById(picID1))
+      if (!chart) {
+        chart = echarts.init(document.getElementById(picID1)).setOption(option);
+      }
 
       var option = {
         title: {
           text:"Volume"
         },
-        tooltip: {},
+        tooltip: {
+          trigger: "item",
+          triggerOn: 'mousemove|click',
+        },
         legend: {},
-        xAxis: {type: "time"},
-        yAxis: {},
+        xAxis: {type: "category"},
+        yAxis: {
+          type: "value",          
+          max: "dataMax",
+        },
+        dataZoom: [{
+          start: 0,
+          type: "inside"
+        }, {
+          start: 0
+        }],
         dataset: {
           source: eval(dataInput),
         },
@@ -107,10 +142,17 @@ export default {
           }
         }],
       };
-      echarts.init(document.getElementById(picID2)).setOption(option);
+      chart = echarts.getInstanceByDom(document.getElementById(picID2))
+      if (chart) {
+        echarts.dispose(chart)
+      }
+      chart = echarts.getInstanceByDom(document.getElementById(picID2))
+      if (!chart) {
+        chart = echarts.init(document.getElementById(picID2)).setOption(option);
+      }
     },
 
-  }
+  },
 }
 </script>
 

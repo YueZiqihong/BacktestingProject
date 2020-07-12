@@ -57,20 +57,18 @@ export default {
         form.append('file', param.file)
         console.log(form.get('file'));
 
-        this.axios.post('http://127.0.0.1:8000/analysisTool/upload',form,config)
+        this.axios.post('http://127.0.0.1:8000/analysisTool/upload',form, config)
         .then((response) => {
           console.log(response)
 
 
 
-          if (response['error_num'] == 0) {
-            this.$message({
-              message: 'Transaction data uploaded!',
-              type: 'success'
-            });
+          if (response['data']['error_num'] == 0) {
+            alert('Transaction data uploaded!')
           }
           else {
-            this.$message.error(response['msg']);
+            alert(response['data']['msg'])
+
           }
 
         })

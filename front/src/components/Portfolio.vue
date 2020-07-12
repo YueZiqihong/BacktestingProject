@@ -29,7 +29,8 @@
 
     <el-button @click="search" style="margin: 2px;">Search</el-button>
 
-    <div id="testChart1" style="width:500px;height:400px;display:inline;"></div>
+    <div id="testChart1" style="width:1000px;height:600px;margin: auto;"></div>
+
   </div>
 </template>
 
@@ -73,15 +74,16 @@ export default {
             .then((response) => {
               // console.log(response["data"]["performance"]["yz"])
               // this.drawPortfolio(response["data"]["performance"]["yz"],"testChart1")
-              this.drawPortfolio(response["data"]["dates"],response["data"]["performanceTuple"],"testChart1")
+              this.drawPortfolio(response["data"]["performanceTuple"],"testChart1")
               console.log(response)
             })
             .catch((error) => {
               console.log(error)
             })
     },
-    drawPortfolio: function(dates,dataInputObj,picID) {
+    drawPortfolio: function(dataInputObj,picID) {
          var series = []
+
          for (let book in dataInputObj) {
            series.push({
              name: book,
@@ -93,17 +95,34 @@ export default {
            title: {
              text:"Portfolio Value"
            },
-           tooltip: {},
-           legend: {},
-           xAxis: {
-             // type: "time",
-             data: eval(dates)
+           tooltip: {
+             trigger: "item",
+             triggerOn: 'mousemove|click',
            },
-           yAxis: {},
+           xAxis: {
+             type: "category",
+             // data: eval(dates)
+           },
+           yAxis: {
+             type: "value",
+             min: "dataMin",
+             max: "dataMax",
+           },
+           legend: {},
+
            series: series
          };
          // console.log(option)
-         echarts.init(document.getElementById(picID)).setOption(option);
+         let chart = echarts.getInstanceByDom(document.getElementById(picID))
+         if (chart) {
+           echarts.dispose(chart)
+         }
+         chart = echarts.getInstanceByDom(document.getElementById(picID))
+         if (!chart) {
+           chart = echarts.init(document.getElementById(picID)).setOption(option);
+         }
+
+         // echarts.init(document.getElementById(picID)).setOption(option);
        }
   }
 }

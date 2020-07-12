@@ -163,6 +163,7 @@ class VirtualSE:
         # 插入order_book表格
         self.brokerdb.createOrderBookTable()
 
+
     def setTradingBookInfo(self):
         """
         Call Strategy中的用户信息函数, 将结果传递给monobroker对象的addInvestorBooks方法.
@@ -262,3 +263,17 @@ class VirtualSE:
         self.brokerdb.close()
         self.marketdb.close()
         logging.shutdown()
+
+    def getTransactionData(self):
+        return open("hist_position.csv")
+
+    def clear(self):
+        """
+        Clean up temp files.
+        """
+        # if os.path.exists(filename):
+        os.remove("aTest.db")
+        os.remove("hist_position.csv")
+        os.remove("example.log")
+        # os.remove("20200613DTestME.db")
+        # os.remove("testMarket.db") # Occupied, cannot be del

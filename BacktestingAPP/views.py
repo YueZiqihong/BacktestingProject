@@ -9,9 +9,6 @@ from .models import *
 from BacktestingAPP import marketControl
 from django.db import connection
 
-from .testtools.test2 import Testobj2 as T2
-# from .testtools import test2
-from .testtools.handler import generate
 # Create your views here.
 
 
@@ -44,11 +41,9 @@ def test(request):
     response = {}
     try:
 
-        temp = T2()
-        # temp = test2.T2()
-        response['test2'] = temp.testval2
-        response['test3'] = temp.testval3
-        generate(request)
+        # response['test'] = requestHandler.generate(request)
+
+
 
         response['msg'] = 'success'
         response['error_num'] = 0
