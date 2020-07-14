@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'BacktestingAPP',
+    # 'BacktestingAPP',
     'analysisTool'
 ]
 
@@ -81,9 +81,7 @@ WSGI_APPLICATION = 'BacktestingProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        # 'NAME': os.path.join(BASE_DIR, 'testMarket.db'),
-        'NAME': os.path.join(BASE_DIR, 'testdb.db'),
+        'NAME': os.path.join(BASE_DIR, 'testdb.db'),        
     },
     "analysis": {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -94,7 +92,7 @@ DATABASES = {
 DATABASE_ROUTERS = ['BacktestingProject.databaseRouter.DB2APPRouter']
 
 DATABASE_APPS_MAPPING = {
-    'BacktestingAPP': 'defualt',
+    # 'BacktestingAPP': 'defualt',
     'analysisTool':  'analysis',
 }
 
