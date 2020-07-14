@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div id="logo">
-      <h1><img src="./assets/web.png" float="left">Welcome to our backtestingsystem!</h1>
+      <h1><img src="./assets/web.png" float="left"> Welcome to our backtestingsystem!</h1>
     </div>
 
     <el-menu :default-active="this.$router.path" mode="horizontal" router
