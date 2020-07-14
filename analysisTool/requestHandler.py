@@ -51,21 +51,24 @@ def simulate(params):
         testval = [startDate,endDate,stockPool,strategy]
 
 
-        # startDate = '20200301'
-        # endDate = '20200603'
-        # stockPool = []
-        # strategy = ""
+
+        startDate = '20200301'
+        endDate = '20200603'
+        stockPool = []
+        strategy = ""
 
 
         backtest = vs.VirtualSE()
         backtest.setRunningInterval(startDate, endDate)
         backtest.setBacktestingPriceEngine("backward")
         # backtest.setStockPool(stockPool)
-        backtest.setBrokerDB("aTest.db")
-        backtest.setMarketExpressDB("externalDB.DB")
+        backtest.setBrokerDB("aTest.db")        
+        backtest.setMarketExpressDB("externalDB.db")
+
 
         strategy = pickyinvestor.PickyInvestor()
         backtest.setTradingStrategy(strategy)
+
         backtest.execute()
 
         transactionDataFile = backtest.getTransactionData()
