@@ -1,7 +1,7 @@
-from django.db import models
+from django.db import models 
 
 class TradeCalendar(models.Model):
-    trade_date = models.DateField(blank=True, null=True)    
+    trade_date = models.DateField(blank=True, null=True)
 
     class Meta:
         app_label = "analysisTool"
