@@ -3,7 +3,6 @@ import Router from 'vue-router'
 import Homepage from '@/components/Homepage'
 import Backtesting from '@/components/Backtesting'
 import StockPool from '@/components/StockPool'
-import Report from '@/components/Report'
 import Uploader from '@/components/Uploader'
 import Search from '@/components/Search'
 import Portfolio from '@/components/Portfolio'
@@ -38,11 +37,6 @@ export default new Router({
       path:'/search',
       name:'Search',
       component: Search
-    },
-    {
-      path:'/report',
-      name:'Report',
-      component: Report
     },
     {
       path:'/portfolio',

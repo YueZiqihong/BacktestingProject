@@ -4,24 +4,11 @@
     <h1>Customize your Strategy</h1>
     </div><br>
     <h2>Strategy</h2>
-    <el-input
-      type="text"
-      size="medium"
-      placeholder="Write your strategy"
-      v-model="strategy"
-      clearable
-      style="width:600px">
-    </el-input>
 
-    <!-- <el-select style="width:200px;" v-model="accountName" multiple placeholder="One or more">
-　     <el-option v-for="item in optList":key="item.value":value="item.value"></el-option>
-    </el-select><br><br> -->
-
-    <select style="width:200px;" v-model="selectStrategy" @change='getDefaultStrategy'>
-　　        <option disabled value=''>--Select default strategy--</option>
-　     　   <option v-for="item in optList">{{ item }}</option>
-    </select>
-
+    <el-select style="width:200px;" v-model="strategy" placeholder="Select Strategy">
+      <el-option v-for="item in optList":key="item":value="item"></el-option>
+    </el-select>
+    
     <br><br>
     <div class="block">
       <span class="demonstration">Time period:</span>
@@ -41,28 +28,24 @@
     </router-link>
     <br>
     <el-button @click="test" style="margin: 2px; background-color: rgb(255,111,97)">Start testing</el-button>
-    <!-- {{poolInfo}} -->
-
-
 
   </div>
 </template>
 
 <script>
-import Message from 'element-ui'
 export default {
   name: 'Backtesting',
   data () {
     return {
       strategy: "",
       dateList: ["2019-06-01","2020-06-01"],
-      optList: ['Strategy A', 'Strategy B'],
+      optList: ['random', 'nothing'],
       selectStrategy: "",
       poolInfo: this.$route.params.pool,
     }
   },
   methods: {
-    test: function() {      
+    test: function() {
       var stocks = []
       console.log(this.poolInfo.length)
       for (var i = 0; i < this.poolInfo.length; i++) {
@@ -74,7 +57,6 @@ export default {
         endDate: this.dateList[1],
         strategy: this.strategy,
         stockPool: stocks,
-        // stockPool: ["000002.SZ","000001.SZ"],
       }, {indices: false})
 
       this.axios.post('http://127.0.0.1:8000/analysisTool/startBacktesting', data)

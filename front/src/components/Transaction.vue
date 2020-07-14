@@ -25,7 +25,6 @@
         <el-option v-for="item in optList":key="item.value":value="item.value"></el-option>
       </el-select>
     </p>
-
     <p>Stock ticker:
       <el-input
         size="medium"

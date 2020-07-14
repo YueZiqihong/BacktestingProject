@@ -98,7 +98,6 @@ export default {
     .then((response) => {
       this.stocks=eval(response["data"]["price"])
       this.backupstocks=eval(response["data"]["price"])
-      // console.log(eval(response["data"]["price"]))
     })
     .catch((error) => {
       console.log(error)
@@ -118,7 +117,6 @@ export default {
         this.stocks.push(this.backupstocks[i])
       }
       if (event.target.value=="Hushen 300"){
-        // console.log(this.backupstocks)
         this.stocks=[]
         var flag=-1
         for(var i=0;i<this.defaultstocks.length;i++){
@@ -129,8 +127,7 @@ export default {
               break
             }
           }
-        }
-        // console.log(this.stocks.length)
+        }        
       }
       if (event.target.value=="Clear All"){
         this.stocks=[]

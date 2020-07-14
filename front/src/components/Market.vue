@@ -30,11 +30,9 @@
     </p>
     <el-button @click="search" style="margin: 2px;">Search</el-button>
 
-    <div id="testChart1" style="width:1000px;height:600px;margin: auto;"></div>
-    <div id="testChart2" style="width:1000px;height:600px;margin: auto;"></div>
-
+    <div id="stockPrice" style="width:1000px;height:600px;margin: auto;"></div>
+    <div id="stockVolume" style="width:1000px;height:600px;margin: auto;"></div>
     <br><br><br>
-
   </div>
 </template>
 
@@ -60,12 +58,13 @@ export default {
       })
       .then((response) => {
         console.log(response)
-        this.drawMarket(response["data"]["marketData"],"testChart1","testChart2")
+        this.drawMarket(response["data"]["marketData"],"stockPrice","stockVolume")
       })
       .catch(function (error) {
         console.log(error)
       })
     },
+    
     drawMarket: function(dataInput,picID1,picID2) {
       var option = {
         title: {
@@ -93,7 +92,6 @@ export default {
         },
         series:  [{
           type: 'candlestick',
-          // dimensions: ['Date', 'open', 'close', 'low', 'high'],
           encode: {
             x: "Date",
             y: ["open","close","low","high"],

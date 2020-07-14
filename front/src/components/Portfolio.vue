@@ -7,7 +7,6 @@
     <router-link to="/search">
       Other avaliable graphs<br><br>
     </router-link>
-
     <br><br>
     <div class="block">
       <span class="demonstration">Time period:</span>
@@ -20,17 +19,13 @@
         end-placeholder="End Date">
       </el-date-picker>
     </div>
-
     <p>Specify accounts:
       <el-select style="width:200px;" v-model="accountName" multiple placeholder="One or more">
   　     　   <el-option v-for="item in optList":key="item.value":value="item.value"></el-option>
       </el-select><br><br>
     </p>
-
     <el-button @click="search" style="margin: 2px;">Search</el-button>
-
-    <div id="testChart1" style="width:1000px;height:600px;margin: auto;"></div>
-
+    <div id="portfolioValue" style="width:1000px;height:600px;margin: auto;"></div>
   </div>
 </template>
 
@@ -53,14 +48,13 @@ export default {
       for(var i=0;i<plst.length;i++){
         this.optList.push({"value":plst[i]})
       }
-      // console.log(this.optList)
     })
     .catch((error) => {
       console.log(error)
     })
   },
   methods: {
-    search: function (){
+    search: function () {
       this.axios.get('http://127.0.0.1:8000/analysisTool/getPortfolio', {
               params: {
                 startDate: this.dateList[0],
@@ -72,15 +66,14 @@ export default {
               }
             })
             .then((response) => {
-              // console.log(response["data"]["performance"]["yz"])
-              // this.drawPortfolio(response["data"]["performance"]["yz"],"testChart1")
-              this.drawPortfolio(response["data"]["performanceTuple"],"testChart1")
+              this.drawPortfolio(response["data"]["performanceTuple"],"portfolioValue")
               console.log(response)
             })
             .catch((error) => {
               console.log(error)
             })
     },
+
     drawPortfolio: function(dataInputObj,picID) {
          var series = []
 
@@ -101,7 +94,6 @@ export default {
            },
            xAxis: {
              type: "category",
-             // data: eval(dates)
            },
            yAxis: {
              type: "value",
@@ -112,7 +104,6 @@ export default {
 
            series: series
          };
-         // console.log(option)
          let chart = echarts.getInstanceByDom(document.getElementById(picID))
          if (chart) {
            echarts.dispose(chart)
@@ -121,9 +112,7 @@ export default {
          if (!chart) {
            chart = echarts.init(document.getElementById(picID)).setOption(option);
          }
-
-         // echarts.init(document.getElementById(picID)).setOption(option);
-       }
+     }
   }
 }
 </script>

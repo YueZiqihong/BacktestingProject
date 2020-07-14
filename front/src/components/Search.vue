@@ -1,6 +1,5 @@
 <template>
   <div class="search">
-
     <div class="container">
       <h1>Quick Navigation</h1>
     </div><br><br>
