@@ -9,6 +9,8 @@ from .models import TradeCalendar
 from .models import Position
 
 def getDateIDs():
+    """Get a dictionary mapping date to id in the database.
+    """
     tradeID = {}
     tradeDays = TradeCalendar.objects.all()
     for tradeDay in tradeDays:
@@ -47,36 +49,24 @@ def simulate(params):
         stockPool = params['stockPool']
         strategy = params['strategy']
         testval = [startDate,endDate,stockPool,strategy]
-        
-        # 自己测的时候可以手动输入
-        startDate = '20200301'
-        endDate = '20200603'
-        stockPool = [] # 之后我处理，应该是一个列表，每一项是一个ticker
-        strategy = "" # 可以先自己写
+
+
+        # startDate = '20200301'
+        # endDate = '20200603'
+        # stockPool = []
+        # strategy = ""
 
 
         backtest = vs.VirtualSE()
-        # 设置回测日期
         backtest.setRunningInterval(startDate, endDate)
-        # 设置价格回测方式
         backtest.setBacktestingPriceEngine("backward")
-        # 设置股票池
         # backtest.setStockPool(stockPool)
-        # 可选创建本次回测的临时数据库
-        # backtest.createMarketExpressDB("testMarket.db", "...")
-        ## 加载两个数据库
         backtest.setBrokerDB("aTest.db")
-        backtest.setMarketExpressDB("20200613DTestME.db")
+        backtest.setMarketExpressDB("externalDB.DB")
 
-        # 初始化策略实例
         strategy = pickyinvestor.PickyInvestor()
-        # 加载策略
         backtest.setTradingStrategy(strategy)
-        # 运行之后, 可能会报divide的warning无视; 产生log文件无视; 生成csv文件默认不包括表头(由于多次写入)
-        # book,ts_code,position,value,wavg_cost,return,pct_return
         backtest.execute()
-
-        # 标注一下即可，最后我需要处理数据类型才能正常连
 
         transactionDataFile = backtest.getTransactionData()
         tradeID = getDateIDs()
@@ -88,9 +78,7 @@ def simulate(params):
                 Position.objects.all().delete()
                 statements = []
                 continue
-
             infomation = line.split()[0].split(",")
-
             value = infomation[indexes[4]] if infomation[indexes[4]]!="" else 0
             return_field = infomation[indexes[6]] if infomation[indexes[6]]!="" else 0
             pct_return = infomation[indexes[7]] if infomation[indexes[7]]!="" else 0
@@ -107,8 +95,6 @@ def simulate(params):
             ))
         Position.objects.bulk_create(statements)
 
-
-
         transactionDataFile.close()
         backtest.clear()
         return testval
@@ -116,8 +102,3 @@ def simulate(params):
 
     except Exception as e:
         print(str(e))
-
-
-# if __name__ == '__main__':
-#     print("f y")
-#     generate(0)
