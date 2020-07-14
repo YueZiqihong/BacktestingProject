@@ -22,18 +22,14 @@ class MyEncoder(json.JSONEncoder):
             return json.JSONEncoder.default(self, obj)
 
 
-# Create your views here.
 @require_http_methods(["GET"])
 def getPortfolioData(request):
     response = {}
     try:
         books = request.GET.getlist("books")
-        response["test"] = books
-        # books = ["jx","yz"]
+        response["books"] = books
         startDate = datetime.datetime.strptime(request.GET.get("startDate"), '%Y-%m-%d').date()
         endDate = datetime.datetime.strptime(request.GET.get("endDate"), '%Y-%m-%d').date()
-        response["s"] = startDate
-        response["e"] = endDate
 
         response["dates"] = json.dumps(list(TradeCalendar.objects.filter(
         trade_date__range=(startDate,endDate))
@@ -66,7 +62,7 @@ def getPortfolioData(request):
             .annotate(Value=Sum("value")))
             data[book] = json.dumps(list(positions), cls=MyEncoder)
         response["performanceTuple"] = data
-        # 这种写法返回的数据在前端会被字符串括起来，需要eval
+
         response['msg'] = 'success'
         response['error_num'] = 0
     except  Exception as e:
@@ -140,11 +136,6 @@ def setTransactions(request):
     response = {}
     try:
         file = request.FILES.get('file')
-        # response['test1'] = file.name
-        # realfile = file.read().decode("utf-8")
-        # response["test3"] = realfile
-
-        # testdata = []
         tradeID = requestHandler.getDateIDs()
         skipFirstLine = True
         for line in file:
@@ -154,11 +145,9 @@ def setTransactions(request):
                 statements = []
                 continue
             infomation = str(line.split()[0], encoding = "utf-8").split(",")
-            # testdata.append(infomation)
             value = infomation[4] if infomation[4]!="" else 0
             return_field = infomation[6] if infomation[6]!="" else 0
             pct_return = infomation[7] if infomation[7]!="" else 0
-            # testdata.append(trade_day_id)
             statements.append(Position(
             book=infomation[0],
             ts_code=infomation[1],
@@ -170,10 +159,6 @@ def setTransactions(request):
             pct_return=pct_return,
             ))
         Position.objects.bulk_create(statements)
-
-        # response["test2"] = json.dumps(testdata, cls=MyEncoder)
-
-
 
         response['msg'] = 'success'
         response['error_num'] = 0
@@ -238,10 +223,7 @@ def startBacktesting(request):
         params['stockPool'] = request.POST.getlist("stockPool")
         params['strategy'] = request.POST.get("strategy")
 
-
-
-        response['test'] = requestHandler.simulate(params)
-
+        response['params'] = requestHandler.simulate(params)
         response['msg'] = 'success'
         response['error_num'] = 0
     except  Exception as e:
