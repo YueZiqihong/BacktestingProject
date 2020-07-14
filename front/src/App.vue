@@ -1,7 +1,9 @@
 <template>
   <div id="app">
-    <img src="./assets/Yingyingying.gif">
-    <h1>Welcome to our backtestingsystem!</h1>
+    <div id="logo">
+      <h1><img src="./assets/web.png" float="left">Welcome to our backtestingsystem!</h1>
+    </div>
+
     <el-menu :default-active="this.$router.path" mode="horizontal" router
     @select="handleSelect">
       <el-menu-item index="/">Homepage</el-menu-item>
