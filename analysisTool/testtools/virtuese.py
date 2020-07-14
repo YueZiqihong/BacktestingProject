@@ -183,4 +183,4 @@ class VirtualSE:
         os.remove("aTest.db")
         os.remove("hist_position.csv")
         # os.remove("example.log")
-        # os.remove("externalDB.DB")
+        # os.remove("externalDB.db")
