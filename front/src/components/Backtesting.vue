@@ -8,7 +8,7 @@
     <el-select style="width:200px;" v-model="strategy" placeholder="Select Strategy">
       <el-option v-for="item in optList":key="item":value="item"></el-option>
     </el-select>
-    
+
     <br><br>
     <div class="block">
       <span class="demonstration">Time period:</span>
@@ -39,7 +39,7 @@ export default {
     return {
       strategy: "",
       dateList: ["2019-06-01","2020-06-01"],
-      optList: ['random', 'nothing'],
+      optList: ['random'],
       selectStrategy: "",
       poolInfo: this.$route.params.pool,
     }
