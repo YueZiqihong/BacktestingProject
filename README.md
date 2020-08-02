@@ -23,4 +23,4 @@ Then follow instuctions on command line to start the page.
 
 ## Special thanks
 -The backtesting logics located at /analysisTool/testtools is contributed by Yiming Zhang. He also controls how strategies are enacted. (The external database file is a tool used for his testing use)  
--Contribution by Su Zhang to front end development, especially for stock pool displaying features.
+-Contribution by Su Zhang to front end development and part of back end development, especially for stock pool displaying features.
